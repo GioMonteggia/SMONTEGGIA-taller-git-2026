@@ -8,10 +8,10 @@ import jakarta.persistence.Entity;
 @DiscriminatorValue("RIFLE")
 public class Rifle extends Arma {
 
-    @Column(nullable = false)
+    @Column(name = "rifle_cargador")
     private int cargador;
 
-    @Column(name = "precision_arma", nullable = false)
+    @Column(name = "precision_arma")
     private float precision;
 
     protected Rifle() {
