@@ -62,6 +62,19 @@ public class Rifle extends Arma {
                 + danioEfectivo + " de daño.";
     }
 
+    public void actualizarEspecificos(Rifle otro) {
+        if (otro == null) {
+            throw new IllegalArgumentException("El rifle no puede ser nulo");
+        }
+
+        if (otro.cargador <= 0) {
+            throw new IllegalArgumentException("El cargador debe ser mayor que 0");
+        }
+
+        this.cargador = otro.cargador;
+        this.precision = otro.precision;
+    }
+
     public int getCargador() {
         return cargador;
     }
