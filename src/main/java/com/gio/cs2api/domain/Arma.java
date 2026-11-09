@@ -1,13 +1,45 @@
+
 package com.gio.cs2api.domain;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorColumn;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
+
+@Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "tipo_arma")
 public abstract class Arma {
 
-    private final String nombre;
-    private final float precio;
-    private final int dano;
-    private final float peso;
-    private final int municionMax;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false)
+    private String nombre;
+
+    @Column(nullable = false)
+    private float precio;
+
+    @Column(nullable = false)
+    private int dano;
+
+    @Column(nullable = false)
+    private float peso;
+
+    @Column(nullable = false)
+    private int municionMax;
+
+    @Column(nullable = false)
     private int municionActual;
+
+    protected Arma() {
+        // Constructor requerido por JPA.
+    }
 
     public Arma(String nombre, float precio, int dano, float peso, int municionMax) {
 
@@ -52,6 +84,10 @@ public abstract class Arma {
 
     public String obtenerNombre() {
         return nombre;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getNombre() {
