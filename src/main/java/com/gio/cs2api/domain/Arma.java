@@ -1,4 +1,3 @@
-
 package com.gio.cs2api.domain;
 
 import jakarta.persistence.Column;
@@ -42,7 +41,23 @@ public abstract class Arma {
     }
 
     public Arma(String nombre, float precio, int dano, float peso, int municionMax) {
+        validarDatos(nombre, precio, dano, peso, municionMax);
 
+        this.nombre = nombre;
+        this.precio = precio;
+        this.dano = dano;
+        this.peso = peso;
+        this.municionMax = municionMax;
+        this.municionActual = municionMax;
+    }
+
+    private void validarDatos(
+            String nombre,
+            float precio,
+            int dano,
+            float peso,
+            int municionMax
+    ) {
         if (nombre == null || nombre.isBlank()) {
             throw new IllegalArgumentException("El nombre no puede estar vacío");
         }
@@ -62,13 +77,6 @@ public abstract class Arma {
         if (municionMax <= 0) {
             throw new IllegalArgumentException("La munición máxima debe ser mayor que 0");
         }
-
-        this.nombre = nombre;
-        this.precio = precio;
-        this.dano = dano;
-        this.peso = peso;
-        this.municionMax = municionMax;
-        this.municionActual = municionMax;
     }
 
     public abstract String disparar();
@@ -84,6 +92,33 @@ public abstract class Arma {
 
     public String obtenerNombre() {
         return nombre;
+    }
+
+    public void actualizarDesde(Arma otra) {
+        if (otra == null) {
+            throw new IllegalArgumentException("El arma actualizada no puede ser nula");
+        }
+
+        if (getClass() != otra.getClass()) {
+            throw new IllegalArgumentException(
+                    "No se puede cambiar el tipo de arma durante una actualización"
+            );
+        }
+
+        validarDatos(
+                otra.nombre,
+                otra.precio,
+                otra.dano,
+                otra.peso,
+                otra.municionMax
+        );
+
+        this.nombre = otra.nombre;
+        this.precio = otra.precio;
+        this.dano = otra.dano;
+        this.peso = otra.peso;
+        this.municionMax = otra.municionMax;
+        this.municionActual = otra.municionActual;
     }
 
     public Long getId() {
