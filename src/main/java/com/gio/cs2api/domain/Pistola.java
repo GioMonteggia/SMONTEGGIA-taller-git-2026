@@ -60,6 +60,21 @@ public class Pistola extends Arma {
         return obtenerNombre() + " dispara a " + distancia + " metros.";
     }
 
+    public void actualizarEspecificos(Pistola otra) {
+        if (otra == null) {
+            throw new IllegalArgumentException("La pistola no puede ser nula");
+        }
+
+        if (otra.cargador <= 0) {
+            throw new IllegalArgumentException(
+                    "El cargador debe ser mayor que 0"
+            );
+        }
+
+        this.cargador = otra.cargador;
+        this.modoDisparo = otra.modoDisparo;
+    }
+
     public String getModoDisparo() {
         return modoDisparo;
     }
