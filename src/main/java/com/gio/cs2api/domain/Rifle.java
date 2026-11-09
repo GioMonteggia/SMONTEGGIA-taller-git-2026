@@ -1,9 +1,22 @@
 package com.gio.cs2api.domain;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
+
+@Entity
+@DiscriminatorValue("RIFLE")
 public class Rifle extends Arma {
 
-    private final int cargador;
-    private final float precision;
+    @Column(nullable = false)
+    private int cargador;
+
+    @Column(name = "precision_arma", nullable = false)
+    private float precision;
+
+    protected Rifle() {
+        // Constructor requerido por JPA.
+    }
 
     public Rifle(String nombre, float precio) {
         this(nombre, precio, 36, 30);
@@ -13,11 +26,15 @@ public class Rifle extends Arma {
         super(nombre, precio, dano, 3.7f, cargador);
 
         if (cargador <= 0) {
-            throw new IllegalArgumentException("El cargador no puede ser 0 o negativo");
+            throw new IllegalArgumentException(
+                    "El cargador no puede ser 0 o negativo"
+            );
         }
 
         if (dano <= 0) {
-            throw new IllegalArgumentException("El daño no puede ser 0 o negativo");
+            throw new IllegalArgumentException(
+                    "El daño no puede ser 0 o negativo"
+            );
         }
 
         this.cargador = cargador;
@@ -31,7 +48,9 @@ public class Rifle extends Arma {
 
     public String disparar(int distancia) {
         if (distancia < 0) {
-            throw new IllegalArgumentException("La distancia no puede ser negativa");
+            throw new IllegalArgumentException(
+                    "La distancia no puede ser negativa"
+            );
         }
 
         consumirMunicion();
