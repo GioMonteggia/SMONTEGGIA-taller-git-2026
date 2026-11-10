@@ -102,18 +102,29 @@ Para compilar sin ejecutar las pruebas:
 10. Agotar la munición de un arma de prueba e intentar disparar otra vez; comprobar HTTP 409 y que el estado no cambie por el disparo fallido.
 11. Consultar las acciones disponibles mediante el endpoint de la interfaz `AccionCombate`.
 
-## 9. Verificaciones ejecutadas hasta el momento
+## 9. Verificaciones ejecutadas
 
-- Compilación: `BUILD SUCCESS`.
-- Pruebas automatizadas: 6 ejecutadas, 0 fallos y 0 errores.
-- Se comprobaron manualmente operaciones CRUD, validaciones, persistencia de disparo y recarga, arma inexistente y falta de munición.
+Las siguientes comprobaciones se ejecutaron manualmente desde Insomnia contra la aplicación en funcionamiento:
 
-La colección de Insomnia todavía debe importarse y recorrerse para confirmar que todas las solicitudes estén configuradas correctamente en el entorno final.
+- `GET /`: HTTP 200.
+- Creación de arma válida: HTTP 201.
+- Consulta de lista y arma individual: HTTP 200.
+- Actualización mediante PUT: HTTP 200; un GET posterior confirmó los datos actualizados.
+- POST con nombre vacío: HTTP 400; la lista posterior confirmó que no se creó el arma inválida.
+- Consulta de arma inexistente: HTTP 404 con `ArmaNoEncontradaException`.
+- Consulta de acciones de combate mediante `AccionCombate`: HTTP 200.
+- Disparo: HTTP 200; disminuyó la munición del rifle y la vida del jugador.
+- Recarga: HTTP 200; se restauró la capacidad del cargador y disminuyó la reserva del jugador.
+- Disparo adicional con munición agotada: HTTP 409 con `MunicionAgotadaException`; la vida y la munición no cambiaron por el disparo rechazado.
+- Consultas posteriores confirmaron el estado persistido del rifle y del jugador.
+- Eliminación de arma: HTTP 204; una consulta posterior al mismo ID devolvió HTTP 404.
 
-## 10. Enlace del commit final
+Las seis pruebas automatizadas también finalizaron con `BUILD SUCCESS`, sin fallos ni errores.
 
-Commit de implementación principal:
+## 10. Enlace del commit de la solucion
 
-https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026/commit/b876d7d740df09eac41e5312a84aae77cb1b8c0d
+Commit de implementacion funcional y coleccion Insomnia verificada:
 
-Este enlace identifica la implementación del CRUD, la persistencia, la simulación y las excepciones. Para entregar la versión con las correcciones finales de documentación, utilizar el enlace del commit más reciente de la rama `poo-08-crud-h2`.
+https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026/commit/dfc498132cd05d27b84dc3cd762758d0f9cc1363
+
+El enlace al commit que contiene las correcciones finales de documentacion se obtiene del resultado de GitHub y es el que debe pegarse en Classroom.

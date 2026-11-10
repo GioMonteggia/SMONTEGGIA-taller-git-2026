@@ -269,11 +269,11 @@ Las propiedades están en `src/main/resources/application.properties` y se expli
 
 ## Commit de entrega
 
-Commit de implementación principal:
+Commit que contiene la implementacion funcional, las reglas de simulacion, las excepciones y la coleccion de Insomnia verificada:
 
-https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026/commit/b876d7d740df09eac41e5312a84aae77cb1b8c0d
+https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026/commit/dfc498132cd05d27b84dc3cd762758d0f9cc1363
 
-Al entregar en Classroom, utilizar el enlace exacto del commit más reciente que incluya las correcciones finales de documentación e Insomnia.
+El enlace de entrega de Classroom debe apuntar al commit publicado mas reciente que incluya las correcciones finales.
 
 
 Repositorio: https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026
