@@ -1,4 +1,4 @@
-﻿# Especificación de entrega: POO-08 CRUD H2 e Insomnia
+# Especificación de entrega: POO-08 CRUD H2 e Insomnia
 
 ## 1. Objetivo
 
@@ -112,4 +112,8 @@ La colección de Insomnia todavía debe importarse y recorrerse para confirmar q
 
 ## 10. Enlace del commit final
 
-Pendiente: completar después de crear y verificar el commit final de entrega.
+Commit de implementación principal:
+
+https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026/commit/b876d7d740df09eac41e5312a84aae77cb1b8c0d
+
+Este enlace identifica la implementación del CRUD, la persistencia, la simulación y las excepciones. Para entregar la versión con las correcciones finales de documentación, utilizar el enlace del commit más reciente de la rama `poo-08-crud-h2`.
