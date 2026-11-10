@@ -12,7 +12,7 @@ import jakarta.persistence.InheritanceType;
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "tipo_arma")
-public abstract class Arma {
+public abstract class Arma implements AccionCombate {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -86,6 +86,9 @@ public abstract class Arma {
         return nombre + " recargada.";
     }
 
+    public String describirAcciones() {
+        return obtenerNombre() + ": permite disparar y recargar.";
+    }
     public String obtenerPrecio() {
         return "Precio: $" + precio;
     }
@@ -150,8 +153,12 @@ public abstract class Arma {
     }
 
     protected void consumirMunicion() {
-        if (municionActual > 0) {
-            municionActual--;
+        if (municionActual <= 0) {
+            throw new MunicionAgotadaException(
+                    "No queda munición en " + nombre
+            );
         }
+
+        municionActual--;
     }
 }

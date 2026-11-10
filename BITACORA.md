@@ -1,4 +1,4 @@
-# Bitácora de uso de Inteligencia Artificial
+﻿# Bitácora de uso de Inteligencia Artificial
 
 ## Herramienta utilizada
 
@@ -6,7 +6,7 @@ Durante el desarrollo de este proyecto se utilizó:
 
 - **Asistente:** ChatGPT
 - **Proveedor:** OpenAI
-- **Modelo:** GPT-5.6 Luna
+- **Modelo:** GPT-6
 
 ## Objetivo del uso de IA
 
@@ -158,3 +158,32 @@ La utilización de IA permitió apoyar el análisis, implementación, revisión 
 La implementación final fue comprobada mediante pruebas automatizadas y pruebas manuales de los endpoints REST.
 
 El resultado final mantiene la separación entre dominio y controladores REST, aplica encapsulamiento, herencia, polimorfismo, overriding, overloading, constructores sobrecargados e invariantes, además de incorporar un inventario polimórfico para el jugador.
+
+
+## Registro complementario: práctico POO-08 CRUD H2
+
+### Herramienta y modelo
+
+- Asistente: ChatGPT.
+- Proveedor: OpenAI.
+- Modelo utilizado en esta asistencia: GPT-6.
+
+### Resumen de los pedidos realizados
+
+Se solicitó asistencia para revisar los requisitos del práctico, implementar la persistencia H2 con Spring Data JPA, completar el CRUD REST de armas, incorporar jugadores persistidos y preparar una simulación de combate.
+
+También se pidió revisar la interfaz `AccionCombate`, organizar la jerarquía de excepciones de dominio, traducir los errores a respuestas HTTP, preparar una colección de Insomnia y actualizar la documentación del proyecto.
+
+Durante el proceso se analizaron errores de compilación, se corrigieron anotaciones transaccionales duplicadas y se ejecutaron pruebas con Maven. La asistencia también incluyó sugerencias para comprobar manualmente las validaciones y la persistencia del estado de las simulaciones.
+
+### Verificaciones realizadas
+
+- Se compiló el proyecto con `.\mvnw.cmd -DskipTests compile`: resultado `BUILD SUCCESS`.
+- Se ejecutaron las pruebas con `.\mvnw.cmd test`: 6 pruebas, 0 fallos y 0 errores.
+- Se probaron operaciones del CRUD, incluyendo creación, consulta, actualización y eliminación de armas.
+- Se verificaron respuestas HTTP de validación y de recurso inexistente.
+- Se comprobó una simulación de disparo que disminuye la munición del arma y la vida del jugador.
+- Se comprobó una recarga que modifica el cargador y la reserva del jugador.
+- Se verificó que intentar disparar con el cargador vacío produzca HTTP 409 sin consumir más munición ni aplicar daño adicional.
+
+Los comandos se ejecutaron en el entorno local del proyecto y sus resultados se revisaron en PowerShell. La asistencia de IA fue una herramienta de apoyo para el desarrollo, las correcciones y la documentación; el resultado final debe revisarse y entregarse desde el repositorio del estudiante.

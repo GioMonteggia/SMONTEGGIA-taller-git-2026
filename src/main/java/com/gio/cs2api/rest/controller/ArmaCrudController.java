@@ -1,6 +1,7 @@
 package com.gio.cs2api.rest.controller;
 
 import com.gio.cs2api.domain.Arma;
+import com.gio.cs2api.domain.ArmaNoEncontradaException;
 import com.gio.cs2api.domain.Pistola;
 import com.gio.cs2api.domain.Rifle;
 import com.gio.cs2api.repository.ArmaRepository;
@@ -36,11 +37,12 @@ public class ArmaCrudController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Arma> buscarPorId(@PathVariable Long id) {
-        return armaRepository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        Arma arma = armaRepository.findById(id)
+                .orElseThrow(() -> new ArmaNoEncontradaException(
+                        "No existe un arma con ID " + id
+                ));
+        return ResponseEntity.ok(arma);
     }
-
     @PostMapping
     public ResponseEntity<Arma> crear(@RequestBody Map<String, Object> datos) {
         Arma arma = construirArma(datos);
@@ -76,13 +78,13 @@ public class ArmaCrudController {
 
                     return ResponseEntity.ok(armaRepository.save(existente));
                 })
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                .orElseThrow(() -> new ArmaNoEncontradaException("No existe un arma con ID " + id));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         if (!armaRepository.existsById(id)) {
-            return ResponseEntity.notFound().build();
+            throw new ArmaNoEncontradaException("No existe un arma con ID " + id);
         }
 
         armaRepository.deleteById(id);
@@ -143,6 +145,12 @@ public class ArmaCrudController {
                     "El campo '" + campo + "' debe ser numérico"
             );
         }
-        return numero.intValue();
+        try {
+            return new java.math.BigDecimal(numero.toString()).intValueExact();
+        } catch (ArithmeticException | NumberFormatException exception) {
+            throw new IllegalArgumentException(
+                    "El campo '" + campo + "' debe ser un número entero"
+            );
+        }
     }
 }

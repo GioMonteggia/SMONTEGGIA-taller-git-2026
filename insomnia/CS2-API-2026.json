@@ -1,0 +1,576 @@
+﻿{
+    "resources":  [
+                      {
+                          "modified":  1794274870708,
+                          "name":  "CS2 API - Taller Git 2026",
+                          "description":  "CRUD de armas, simulación persistida y excepciones de dominio.",
+                          "parentId":  null,
+                          "scope":  "collection",
+                          "created":  1794274870708,
+                          "_type":  "workspace",
+                          "_id":  "wrk_cs2api"
+                      },
+                      {
+                          "data":  {
+                                       "base_url":  "http://localhost:8080",
+                                       "rifleVacioId":  "REEMPLAZAR_CON_ID",
+                                       "rifleId":  "REEMPLAZAR_CON_ID",
+                                       "jugadorId":  "REEMPLAZAR_CON_ID"
+                                   },
+                          "parentId":  "wrk_cs2api",
+                          "isPrivate":  false,
+                          "_type":  "environment",
+                          "created":  1794274870708,
+                          "name":  "Base Environment",
+                          "modified":  1794274870708,
+                          "_id":  "env_cs2api",
+                          "metaSortKey":  1
+                      },
+                      {
+                          "description":  "",
+                          "parentId":  "wrk_cs2api",
+                          "_type":  "request_group",
+                          "created":  1794274870708,
+                          "name":  "1 - CRUD de armas",
+                          "modified":  1794274870708,
+                          "_id":  "fld_crud",
+                          "environment":  {
+
+                                          },
+                          "metaSortKey":  -10
+                      },
+                      {
+                          "description":  "",
+                          "parentId":  "wrk_cs2api",
+                          "_type":  "request_group",
+                          "created":  1794274870708,
+                          "name":  "2 - Simulación persistida",
+                          "modified":  1794274870708,
+                          "_id":  "fld_sim",
+                          "environment":  {
+
+                                          },
+                          "metaSortKey":  -20
+                      },
+                      {
+                          "description":  "",
+                          "parentId":  "wrk_cs2api",
+                          "_type":  "request_group",
+                          "created":  1794274870708,
+                          "name":  "3 - Excepciones",
+                          "modified":  1794274870708,
+                          "_id":  "fld_ex",
+                          "environment":  {
+
+                                          },
+                          "metaSortKey":  -30
+                      },
+                      {
+                          "settingRebuildPath":  true,
+                          "settingSendCookies":  true,
+                          "authentication":  {
+
+                                             },
+                          "body":  {
+
+                                   },
+                          "description":  "Lista las armas persistidas.",
+                          "modified":  1794274870708,
+                          "headers":  [
+
+                                      ],
+                          "_type":  "request",
+                          "_id":  "req_listar",
+                          "settingStoreCookies":  true,
+                          "metaSortKey":  10,
+                          "isPrivate":  false,
+                          "method":  "GET",
+                          "created":  1794274870708,
+                          "settingDisableRenderRequestBody":  false,
+                          "settingEncodeUrl":  true,
+                          "name":  "GET - Listar armas",
+                          "parentId":  "fld_crud",
+                          "parameters":  [
+
+                                         ],
+                          "url":  "{{ _.base_url }}/api/armas"
+                      },
+                      {
+                          "settingRebuildPath":  true,
+                          "settingSendCookies":  true,
+                          "authentication":  {
+
+                                             },
+                          "body":  {
+                                       "mimeType":  "application/json",
+                                       "text":  "{\"tipo\":\"rifle\",\"nombre\":\"AK-47 Insomnia\",\"precio\":2700,\"dano\":36,\"cargador\":30}"
+                                   },
+                          "description":  "Esperado: 201. Copiá el ID devuelto a rifleId en Base Environment.",
+                          "modified":  1794274870708,
+                          "headers":  [
+                                          {
+                                              "value":  "application/json",
+                                              "name":  "Content-Type"
+                                          }
+                                      ],
+                          "_type":  "request",
+                          "_id":  "req_crear-rifle",
+                          "settingStoreCookies":  true,
+                          "metaSortKey":  20,
+                          "isPrivate":  false,
+                          "method":  "POST",
+                          "created":  1794274870708,
+                          "settingDisableRenderRequestBody":  false,
+                          "settingEncodeUrl":  true,
+                          "name":  "POST - Crear rifle",
+                          "parentId":  "fld_crud",
+                          "parameters":  [
+
+                                         ],
+                          "url":  "{{ _.base_url }}/api/armas"
+                      },
+                      {
+                          "settingRebuildPath":  true,
+                          "settingSendCookies":  true,
+                          "authentication":  {
+
+                                             },
+                          "body":  {
+
+                                   },
+                          "description":  "Esperado: 200. Requiere actualizar rifleId con el ID creado.",
+                          "modified":  1794274870708,
+                          "headers":  [
+
+                                      ],
+                          "_type":  "request",
+                          "_id":  "req_buscar-rifle",
+                          "settingStoreCookies":  true,
+                          "metaSortKey":  30,
+                          "isPrivate":  false,
+                          "method":  "GET",
+                          "created":  1794274870708,
+                          "settingDisableRenderRequestBody":  false,
+                          "settingEncodeUrl":  true,
+                          "name":  "GET - Buscar rifle por ID",
+                          "parentId":  "fld_crud",
+                          "parameters":  [
+
+                                         ],
+                          "url":  "{{ _.base_url }}/api/armas/{{ _.rifleId }}"
+                      },
+                      {
+                          "settingRebuildPath":  true,
+                          "settingSendCookies":  true,
+                          "authentication":  {
+
+                                             },
+                          "body":  {
+                                       "mimeType":  "application/json",
+                                       "text":  "{\"tipo\":\"rifle\",\"nombre\":\"AK-47 Insomnia Editada\",\"precio\":2800,\"dano\":36,\"cargador\":30}"
+                                   },
+                          "description":  "Esperado: 200. Mantener tipo rifle.",
+                          "modified":  1794274870708,
+                          "headers":  [
+                                          {
+                                              "value":  "application/json",
+                                              "name":  "Content-Type"
+                                          }
+                                      ],
+                          "_type":  "request",
+                          "_id":  "req_actualizar-rifle",
+                          "settingStoreCookies":  true,
+                          "metaSortKey":  40,
+                          "isPrivate":  false,
+                          "method":  "PUT",
+                          "created":  1794274870708,
+                          "settingDisableRenderRequestBody":  false,
+                          "settingEncodeUrl":  true,
+                          "name":  "PUT - Actualizar rifle",
+                          "parentId":  "fld_crud",
+                          "parameters":  [
+
+                                         ],
+                          "url":  "{{ _.base_url }}/api/armas/{{ _.rifleId }}"
+                      },
+                      {
+                          "settingRebuildPath":  true,
+                          "settingSendCookies":  true,
+                          "authentication":  {
+
+                                             },
+                          "body":  {
+                                       "mimeType":  "application/json",
+                                       "text":  "{\"tipo\":\"rifle\",\"nombre\":\"\",\"precio\":2700,\"dano\":36,\"cargador\":30}"
+                                   },
+                          "description":  "Esperado: 400 por nombre vacío.",
+                          "modified":  1794274870708,
+                          "headers":  [
+                                          {
+                                              "value":  "application/json",
+                                              "name":  "Content-Type"
+                                          }
+                                      ],
+                          "_type":  "request",
+                          "_id":  "req_post-ilegal",
+                          "settingStoreCookies":  true,
+                          "metaSortKey":  50,
+                          "isPrivate":  false,
+                          "method":  "POST",
+                          "created":  1794274870708,
+                          "settingDisableRenderRequestBody":  false,
+                          "settingEncodeUrl":  true,
+                          "name":  "POST - Nombre vacío (ilegal)",
+                          "parentId":  "fld_crud",
+                          "parameters":  [
+
+                                         ],
+                          "url":  "{{ _.base_url }}/api/armas"
+                      },
+                      {
+                          "settingRebuildPath":  true,
+                          "settingSendCookies":  true,
+                          "authentication":  {
+
+                                             },
+                          "body":  {
+
+                                   },
+                          "description":  "Esperado: 404 con un ID que no exista.",
+                          "modified":  1794274870708,
+                          "headers":  [
+
+                                      ],
+                          "_type":  "request",
+                          "_id":  "req_get-inexistente",
+                          "settingStoreCookies":  true,
+                          "metaSortKey":  10,
+                          "isPrivate":  false,
+                          "method":  "GET",
+                          "created":  1794274870708,
+                          "settingDisableRenderRequestBody":  false,
+                          "settingEncodeUrl":  true,
+                          "name":  "Excepción hija - ArmaNoEncontradaException",
+                          "parentId":  "fld_ex",
+                          "parameters":  [
+
+                                         ],
+                          "url":  "{{ _.base_url }}/api/armas/999999"
+                      },
+                      {
+                          "settingRebuildPath":  true,
+                          "settingSendCookies":  true,
+                          "authentication":  {
+
+                                             },
+                          "body":  {
+                                       "mimeType":  "application/json",
+                                       "text":  "{\"nombre\":\"Jugador Insomnia\",\"vida\":100,\"municionReserva\":90}"
+                                   },
+                          "description":  "Esperado: 201. Copiá el ID devuelto a jugadorId en Base Environment.",
+                          "modified":  1794274870708,
+                          "headers":  [
+                                          {
+                                              "value":  "application/json",
+                                              "name":  "Content-Type"
+                                          }
+                                      ],
+                          "_type":  "request",
+                          "_id":  "req_crear-jugador",
+                          "settingStoreCookies":  true,
+                          "metaSortKey":  10,
+                          "isPrivate":  false,
+                          "method":  "POST",
+                          "created":  1794274870708,
+                          "settingDisableRenderRequestBody":  false,
+                          "settingEncodeUrl":  true,
+                          "name":  "POST - Crear jugador persistido",
+                          "parentId":  "fld_sim",
+                          "parameters":  [
+
+                                         ],
+                          "url":  "{{ _.base_url }}/api/simulacion/jugadores"
+                      },
+                      {
+                          "settingRebuildPath":  true,
+                          "settingSendCookies":  true,
+                          "authentication":  {
+
+                                             },
+                          "body":  {
+
+                                   },
+                          "description":  "Permite verificar vida y reserva de munición guardadas en H2.",
+                          "modified":  1794274870708,
+                          "headers":  [
+
+                                      ],
+                          "_type":  "request",
+                          "_id":  "req_consultar-jugador",
+                          "settingStoreCookies":  true,
+                          "metaSortKey":  20,
+                          "isPrivate":  false,
+                          "method":  "GET",
+                          "created":  1794274870708,
+                          "settingDisableRenderRequestBody":  false,
+                          "settingEncodeUrl":  true,
+                          "name":  "GET - Consultar jugador persistido",
+                          "parentId":  "fld_sim",
+                          "parameters":  [
+
+                                         ],
+                          "url":  "{{ _.base_url }}/api/simulacion/jugadores/{{ _.jugadorId }}"
+                      },
+                      {
+                          "settingRebuildPath":  true,
+                          "settingSendCookies":  true,
+                          "authentication":  {
+
+                                             },
+                          "body":  {
+
+                                   },
+                          "description":  "El disparo consume una bala y reduce la vida. Consultá después ambos objetos con GET.",
+                          "modified":  1794274870708,
+                          "headers":  [
+
+                                      ],
+                          "_type":  "request",
+                          "_id":  "req_disparar",
+                          "settingStoreCookies":  true,
+                          "metaSortKey":  30,
+                          "isPrivate":  false,
+                          "method":  "POST",
+                          "created":  1794274870708,
+                          "settingDisableRenderRequestBody":  false,
+                          "settingEncodeUrl":  true,
+                          "name":  "POST - Simular disparo",
+                          "parentId":  "fld_sim",
+                          "parameters":  [
+
+                                         ],
+                          "url":  "{{ _.base_url }}/api/simulacion/disparar?rifleId={{ _.rifleId }}\u0026jugadorId={{ _.jugadorId }}\u0026distancia=50"
+                      },
+                      {
+                          "settingRebuildPath":  true,
+                          "settingSendCookies":  true,
+                          "authentication":  {
+
+                                             },
+                          "body":  {
+
+                                   },
+                          "description":  "Usa la interfaz de dominio AccionCombate. Ejecutar después de disparar para liberar espacio en el cargador.",
+                          "modified":  1794274870708,
+                          "headers":  [
+
+                                      ],
+                          "_type":  "request",
+                          "_id":  "req_recargar-interfaz",
+                          "settingStoreCookies":  true,
+                          "metaSortKey":  40,
+                          "isPrivate":  false,
+                          "method":  "POST",
+                          "created":  1794274870708,
+                          "settingDisableRenderRequestBody":  false,
+                          "settingEncodeUrl":  true,
+                          "name":  "POST - Recargar mediante AccionCombate",
+                          "parentId":  "fld_sim",
+                          "parameters":  [
+
+                                         ],
+                          "url":  "{{ _.base_url }}/api/simulacion/acciones/{{ _.rifleId }}/recargar?jugadorId={{ _.jugadorId }}"
+                      },
+                      {
+                          "settingRebuildPath":  true,
+                          "settingSendCookies":  true,
+                          "authentication":  {
+
+                                             },
+                          "body":  {
+                                       "mimeType":  "application/json",
+                                       "text":  "{\"tipo\":\"rifle\",\"nombre\":\"Rifle Vacío Insomnia\",\"precio\":1000,\"dano\":36,\"cargador\":1}"
+                                   },
+                          "description":  "Crear este rifle, copiar su ID a rifleVacioId y disparar una vez antes de probar la excepción.",
+                          "modified":  1794274870708,
+                          "headers":  [
+                                          {
+                                              "value":  "application/json",
+                                              "name":  "Content-Type"
+                                          }
+                                      ],
+                          "_type":  "request",
+                          "_id":  "req_crear-rifle-vacio",
+                          "settingStoreCookies":  true,
+                          "metaSortKey":  50,
+                          "isPrivate":  false,
+                          "method":  "POST",
+                          "created":  1794274870708,
+                          "settingDisableRenderRequestBody":  false,
+                          "settingEncodeUrl":  true,
+                          "name":  "POST - Crear rifle de una bala",
+                          "parentId":  "fld_sim",
+                          "parameters":  [
+
+                                         ],
+                          "url":  "{{ _.base_url }}/api/armas"
+                      },
+                      {
+                          "settingRebuildPath":  true,
+                          "settingSendCookies":  true,
+                          "authentication":  {
+
+                                             },
+                          "body":  {
+
+                                   },
+                          "description":  "Esperado: 200. Ejecutar una sola vez para dejar el cargador en cero.",
+                          "modified":  1794274870708,
+                          "headers":  [
+
+                                      ],
+                          "_type":  "request",
+                          "_id":  "req_primer-disparo-vacio",
+                          "settingStoreCookies":  true,
+                          "metaSortKey":  60,
+                          "isPrivate":  false,
+                          "method":  "POST",
+                          "created":  1794274870708,
+                          "settingDisableRenderRequestBody":  false,
+                          "settingEncodeUrl":  true,
+                          "name":  "POST - Consumir única bala",
+                          "parentId":  "fld_sim",
+                          "parameters":  [
+
+                                         ],
+                          "url":  "{{ _.base_url }}/api/simulacion/disparar?rifleId={{ _.rifleVacioId }}\u0026jugadorId={{ _.jugadorId }}\u0026distancia=50"
+                      },
+                      {
+                          "settingRebuildPath":  true,
+                          "settingSendCookies":  true,
+                          "authentication":  {
+
+                                             },
+                          "body":  {
+
+                                   },
+                          "description":  "Primero ejecutá Primer disparo - Consumir única bala. Esperado: 409 al volver a disparar sin munición.",
+                          "modified":  1794274870708,
+                          "headers":  [
+
+                                      ],
+                          "_type":  "request",
+                          "_id":  "req_segundo-disparo-vacio",
+                          "settingStoreCookies":  true,
+                          "metaSortKey":  20,
+                          "isPrivate":  false,
+                          "method":  "POST",
+                          "created":  1794274870708,
+                          "settingDisableRenderRequestBody":  false,
+                          "settingEncodeUrl":  true,
+                          "name":  "Excepción hija - MunicionAgotadaException",
+                          "parentId":  "fld_ex",
+                          "parameters":  [
+
+                                         ],
+                          "url":  "{{ _.base_url }}/api/simulacion/disparar?rifleId={{ _.rifleVacioId }}\u0026jugadorId={{ _.jugadorId }}\u0026distancia=50"
+                      },
+                      {
+                          "settingRebuildPath":  true,
+                          "settingSendCookies":  true,
+                          "authentication":  {
+
+                                             },
+                          "body":  {
+
+                                   },
+                          "description":  "Esperado: 204. Ejecutar al final, porque el rifle se usa en las pruebas de simulación.",
+                          "modified":  1794274870708,
+                          "headers":  [
+
+                                      ],
+                          "_type":  "request",
+                          "_id":  "req_eliminar-rifle",
+                          "settingStoreCookies":  true,
+                          "metaSortKey":  90,
+                          "isPrivate":  false,
+                          "method":  "DELETE",
+                          "created":  1794274870708,
+                          "settingDisableRenderRequestBody":  false,
+                          "settingEncodeUrl":  true,
+                          "name":  "DELETE - Eliminar rifle de prueba",
+                          "parentId":  "fld_crud",
+                          "parameters":  [
+
+                                         ],
+                          "url":  "{{ _.base_url }}/api/armas/{{ _.rifleId }}"
+                      },
+                      {
+                          "_id":  "req_aaa58a4f",
+                          "parentId":  "fld_sim",
+                          "modified":  1794279243510,
+                          "created":  1794279243510,
+                          "url":  "{{ _.base_url }}/api/simulacion/acciones/{{ _.rifleId }}",
+                          "name":  "Consultar acciones del arma - AccionCombate",
+                          "description":  "Consulta las acciones disponibles a traves de la interfaz de dominio.",
+                          "method":  "GET",
+                          "body":  {
+
+                                   },
+                          "parameters":  [
+
+                                         ],
+                          "headers":  [
+
+                                      ],
+                          "authentication":  {
+
+                                             },
+                          "metaSortKey":  "1794279243510",
+                          "isPrivate":  false,
+                          "settingStoreCookies":  true,
+                          "settingSendCookies":  true,
+                          "settingDisableRenderRequestBody":  false,
+                          "settingEncodeUrl":  true,
+                          "settingRebuildPath":  true,
+                          "settingFollowRedirects":  "global",
+                          "_type":  "request"
+                      },
+                      {
+                          "_id":  "req_3d607f88",
+                          "parentId":  "wrk_cs2api",
+                          "modified":  1794279381306,
+                          "created":  1794279381306,
+                          "url":  "{{ _.base_url }}/api/simulacion/recargar?armaId={{ _.rifleId }}\u0026jugadorId={{ _.jugadorId }}",
+                          "name":  "POST - Recargar arma",
+                          "description":  "Recarga el arma usando la reserva de munición del jugador.",
+                          "method":  "POST",
+                          "body":  {
+                                       "mimeType":  "application/json",
+                                       "text":  ""
+                                   },
+                          "parameters":  [
+
+                                         ],
+                          "headers":  [
+
+                                      ],
+                          "authentication":  {
+
+                                             },
+                          "metaSortKey":  "1794279381306",
+                          "isPrivate":  false,
+                          "settingStoreCookies":  true,
+                          "settingSendCookies":  true,
+                          "settingDisableRenderRequestBody":  false,
+                          "settingEncodeUrl":  true,
+                          "settingRebuildPath":  true,
+                          "settingFollowRedirects":  "global",
+                          "_type":  "request"
+                      }
+                  ],
+    "__export_source":  "insomnia.desktop.app",
+    "_type":  "export",
+    "__export_date":  "2026-11-10T01:41:11.628Z",
+    "__export_format":  4
+}

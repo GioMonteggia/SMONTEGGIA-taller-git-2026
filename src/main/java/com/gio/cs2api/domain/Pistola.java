@@ -6,7 +6,7 @@ import jakarta.persistence.Entity;
 
 @Entity
 @DiscriminatorValue("PISTOLA")
-public class Pistola extends Arma {
+public class Pistola extends Arma implements AccionCombate {
 
     @Column(name = "pistola_modo_disparo")
     private String modoDisparo;

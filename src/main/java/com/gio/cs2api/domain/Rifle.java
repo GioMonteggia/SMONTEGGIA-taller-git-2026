@@ -6,7 +6,7 @@ import jakarta.persistence.Entity;
 
 @Entity
 @DiscriminatorValue("RIFLE")
-public class Rifle extends Arma {
+public class Rifle extends Arma implements AccionCombate {
 
     @Column(name = "rifle_cargador")
     private int cargador;
@@ -55,13 +55,22 @@ public class Rifle extends Arma {
 
         consumirMunicion();
 
-        float factor = Math.max(0.5f, 1f - distancia / 100f);
-        int danioEfectivo = Math.round(getDano() * factor * precision);
+        int danioEfectivo = calcularDanioEfectivo(distancia);
 
         return obtenerNombre() + " dispara a " + distancia + " m y causa "
                 + danioEfectivo + " de daño.";
     }
 
+    public int calcularDanioEfectivo(int distancia) {
+        if (distancia < 0) {
+            throw new IllegalArgumentException(
+                    "La distancia no puede ser negativa"
+            );
+        }
+
+        float factor = Math.max(0.5f, 1f - distancia / 100f);
+        return Math.round(getDano() * factor * precision);
+    }
     public void actualizarEspecificos(Rifle otro) {
         if (otro == null) {
             throw new IllegalArgumentException("El rifle no puede ser nulo");
