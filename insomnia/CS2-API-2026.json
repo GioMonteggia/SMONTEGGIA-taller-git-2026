@@ -1,4 +1,4 @@
-﻿{
+{
     "resources":  [
                       {
                           "modified":  1794274870708,
@@ -559,6 +559,37 @@
 
                                              },
                           "metaSortKey":  "1794279381306",
+                          "isPrivate":  false,
+                          "settingStoreCookies":  true,
+                          "settingSendCookies":  true,
+                          "settingDisableRenderRequestBody":  false,
+                          "settingEncodeUrl":  true,
+                          "settingRebuildPath":  true,
+                          "settingFollowRedirects":  "global",
+                          "_type":  "request"
+                      },
+                      {
+                          "_id":  "req_get_root",
+                          "parentId":  "fld_crud",
+                          "modified":  1794280627572,
+                          "created":  1794280627572,
+                          "url":  "{{ _.base_url }}/",
+                          "name":  "GET - Comprobar que la API funciona",
+                          "description":  "Esperado: HTTP 200 y el mensaje API de armas de Counter-Strike 2 funcionando.",
+                          "method":  "GET",
+                          "body":  {
+
+                                   },
+                          "parameters":  [
+
+                                         ],
+                          "headers":  [
+
+                                      ],
+                          "authentication":  {
+
+                                             },
+                          "metaSortKey":  0,
                           "isPrivate":  false,
                           "settingStoreCookies":  true,
                           "settingSendCookies":  true,
