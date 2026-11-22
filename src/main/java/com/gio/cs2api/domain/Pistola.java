@@ -1,3 +1,4 @@
+
 package com.gio.cs2api.domain;
 
 import jakarta.persistence.Column;
@@ -24,21 +25,13 @@ public class Pistola extends Arma implements AccionCombate {
         this.cargador = 12;
     }
 
-    public Pistola(String nombre, float precio, int dano, int cargador) {
+    public Pistola(
+            String nombre,
+            float precio,
+            int dano,
+            int cargador) {
+
         super(nombre, precio, dano, 1.0f, cargador);
-
-        if (dano <= 0) {
-            throw new IllegalArgumentException(
-                    "El daño de la pistola debe ser mayor que 0"
-            );
-        }
-
-        if (cargador <= 0) {
-            throw new IllegalArgumentException(
-                    "El cargador de la pistola debe ser mayor que 0"
-            );
-        }
-
         this.modoDisparo = "Semiautomático";
         this.cargador = cargador;
     }
@@ -50,27 +43,11 @@ public class Pistola extends Arma implements AccionCombate {
     }
 
     public String disparar(int distancia) {
-        if (distancia < 0) {
-            throw new IllegalArgumentException(
-                    "La distancia no puede ser negativa"
-            );
-        }
-
         consumirMunicion();
         return obtenerNombre() + " dispara a " + distancia + " metros.";
     }
 
     public void actualizarEspecificos(Pistola otra) {
-        if (otra == null) {
-            throw new IllegalArgumentException("La pistola no puede ser nula");
-        }
-
-        if (otra.cargador <= 0) {
-            throw new IllegalArgumentException(
-                    "El cargador debe ser mayor que 0"
-            );
-        }
-
         this.cargador = otra.cargador;
         this.modoDisparo = otra.modoDisparo;
     }

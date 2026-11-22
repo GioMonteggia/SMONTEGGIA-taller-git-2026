@@ -1,12 +1,19 @@
+
 package com.gio.cs2api.domain;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Map;
+
+import com.gio.cs2api.service.RifleDemostracionService;
 import org.junit.jupiter.api.Test;
 
 class RifleTests {
+
+    private final RifleDemostracionService servicio =
+            new RifleDemostracionService();
 
     @Test
     void constructorSimpleUsaElRifleDeFabrica() {
@@ -26,42 +33,54 @@ class RifleTests {
     }
 
     @Test
-    void ningunaFirmaDejaElRifleEnUnEstadoImposible() {
+    void servicioValidaLosDatosAntesDeCrearODisparar() {
         assertThrows(
                 IllegalArgumentException.class,
-                () -> new Rifle("AK-47", 2700f, 36, 0)
-        );
+                () -> servicio.detalle("AK-47", 2700f, 36, 0));
 
         assertThrows(
                 IllegalArgumentException.class,
-                () -> new Rifle("AK-47", 2700f, 0, 30)
-        );
+                () -> servicio.detalle("AK-47", 2700f, 0, 30));
 
         assertThrows(
                 IllegalArgumentException.class,
-                () -> new Rifle("AK-47", 2700f).disparar(-1)
-        );
+                () -> servicio.disparar("AK-47", 2700f, 30, -1, 1));
+
+        assertThrows(
+                MunicionAgotadaException.class,
+                () -> servicio.disparar("AK-47", 2700f, 30, 50, 31));
     }
 
     @Test
-    void dispararAfectaLaMunicionYAttenuaConLaDistancia() {
-        Rifle cerca = new Rifle("AK-47", 2700f);
-        Rifle lejos = new Rifle("AK-47", 2700f);
+    void dispararConsumeMunicionYCalculaElDanoSegunDistancia() {
+        Map<String, Object> cerca =
+                servicio.disparar("AK-47", 2700f, 30, 0, 1);
 
-        cerca.disparar(0);
-        lejos.disparar(100);
+        Map<String, Object> lejos =
+                servicio.disparar("AK-47", 2700f, 30, 100, 1);
 
-        assertEquals(29, cerca.getMunicionActual());
-        assertEquals(29, lejos.getMunicionActual());
-        assertTrue(cerca.disparar(0).contains("causa 31"));
-        assertTrue(lejos.disparar(100).contains("causa 15"));
+        assertEquals(29, cerca.get("municionRestante"));
+        assertEquals(29, lejos.get("municionRestante"));
+
+        assertTrue(
+                ((String) cerca.get("disparos")).contains("causa 31"));
+
+        assertTrue(
+                ((String) lejos.get("disparos")).contains("causa 15"));
     }
 
     @Test
     void elDanoNoBajaDeLaMitadPorMuyLejosQueEsten() {
-        Rifle rifle = new Rifle("AK-47", 2700f);
+        Map<String, Object> normal =
+                servicio.disparar("AK-47", 2700f, 30, 100, 1);
 
-        assertTrue(rifle.disparar(100).contains("causa 15"));
-        assertTrue(rifle.disparar(400).contains("causa 15"));
+        Map<String, Object> muyLejos =
+                servicio.disparar("AK-47", 2700f, 30, 400, 1);
+
+        assertTrue(
+                ((String) normal.get("disparos")).contains("causa 15"));
+
+        assertTrue(
+                ((String) muyLejos.get("disparos")).contains("causa 15"));
     }
 }

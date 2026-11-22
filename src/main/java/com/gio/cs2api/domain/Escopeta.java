@@ -11,21 +11,14 @@ public class Escopeta extends Arma {
         this.dispersion = 1.5f;
     }
 
-    public Escopeta(String nombre, float precio, int dano, int cartuchos, float dispersion) {
+    public Escopeta(
+            String nombre,
+            float precio,
+            int dano,
+            int cartuchos,
+            float dispersion) {
+
         super(nombre, precio, dano, 3.0f, cartuchos);
-
-        if (dano <= 0) {
-            throw new IllegalArgumentException("El daño de la escopeta debe ser mayor que 0");
-        }
-
-        if (cartuchos <= 0) {
-            throw new IllegalArgumentException("Los cartuchos deben ser mayores que 0");
-        }
-
-        if (dispersion <= 0) {
-            throw new IllegalArgumentException("La dispersión debe ser mayor que 0");
-        }
-
         this.cartuchos = cartuchos;
         this.dispersion = dispersion;
     }

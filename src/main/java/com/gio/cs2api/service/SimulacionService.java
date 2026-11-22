@@ -1,3 +1,4 @@
+
 package com.gio.cs2api.service;
 
 import com.gio.cs2api.domain.AccionCombate;
@@ -46,9 +47,17 @@ public class SimulacionService {
 
         return respuesta;
     }
+
     @Transactional
     public Map<String, Object> disparar(
-            Long rifleId, Long jugadorId, int distancia) {
+            Long rifleId,
+            Long jugadorId,
+            int distancia) {
+
+        if (distancia < 0) {
+            throw new IllegalArgumentException(
+                    "La distancia no puede ser negativa");
+        }
 
         Arma arma = armaRepository.findById(rifleId)
                 .orElseThrow(() -> new ArmaNoEncontradaException(
@@ -59,14 +68,35 @@ public class SimulacionService {
                     "La simulación de daño requiere un rifle");
         }
 
+        if (rifle.getMunicionActual() <= 0) {
+            throw new MunicionAgotadaException(
+                    "No queda munición en " + rifle.getNombre());
+        }
+
         Jugador objetivo = jugadorRepository.findById(jugadorId)
                 .orElseThrow(() -> new IllegalArgumentException(
                         "No existe un jugador con ID " + jugadorId));
 
-        int dano = rifle.calcularDanioEfectivo(distancia);
-        String resultado = rifle.disparar(distancia);
+        int dano = calcularDanioEfectivo(rifle, distancia);
 
-        objetivo.recibirDano(dano);
+        if (dano <= 0) {
+            throw new IllegalArgumentException(
+                    "El daño calculado debe ser mayor que 0");
+        }
+
+        rifle.disparar(distancia);
+
+        String resultado = rifle.getNombre()
+                + " dispara a " + distancia
+                + " m y causa " + dano + " de daño.";
+
+        int vidaRestante = Math.max(
+                0,
+                objetivo.getVida() - dano);
+
+        objetivo.actualizarEstadoCombate(
+                vidaRestante,
+                objetivo.getMunicionReserva());
 
         armaRepository.save(rifle);
         jugadorRepository.save(objetivo);
@@ -82,9 +112,17 @@ public class SimulacionService {
         return respuesta;
     }
 
+    private int calcularDanioEfectivo(Rifle rifle, int distancia) {
+        float factor = Math.max(0.5f, 1f - distancia / 100f);
+
+        return Math.round(
+                rifle.getDano() * factor * rifle.getPrecision());
+    }
+
     @Transactional
     public Map<String, Object> recargar(
-            Long armaId, Long jugadorId) {
+            Long armaId,
+            Long jugadorId) {
 
         Arma arma = armaRepository.findById(armaId)
                 .orElseThrow(() -> new ArmaNoEncontradaException(
@@ -102,7 +140,17 @@ public class SimulacionService {
                     "El cargador ya está lleno");
         }
 
-        jugador.consumirMunicionReserva(cantidadNecesaria);
+        if (jugador.getMunicionReserva() < cantidadNecesaria) {
+            throw new MunicionAgotadaException(
+                    "El jugador no tiene suficiente munición de reserva");
+        }
+
+        int reservaRestante =
+                jugador.getMunicionReserva() - cantidadNecesaria;
+
+        jugador.actualizarEstadoCombate(
+                jugador.getVida(),
+                reservaRestante);
 
         AccionCombate accion = arma;
         String resultado = accion.recargar();

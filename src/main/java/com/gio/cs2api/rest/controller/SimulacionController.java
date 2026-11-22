@@ -1,7 +1,8 @@
+
 package com.gio.cs2api.rest.controller;
 
 import com.gio.cs2api.domain.Jugador;
-import com.gio.cs2api.repository.JugadorRepository;
+import com.gio.cs2api.service.JugadorService;
 import com.gio.cs2api.service.SimulacionService;
 
 import java.util.Map;
@@ -21,34 +22,30 @@ import org.springframework.web.bind.annotation.RestController;
 public class SimulacionController {
 
     private final SimulacionService simulacionService;
-    private final JugadorRepository jugadorRepository;
+    private final JugadorService jugadorService;
 
     public SimulacionController(
             SimulacionService simulacionService,
-            JugadorRepository jugadorRepository) {
+            JugadorService jugadorService) {
         this.simulacionService = simulacionService;
-        this.jugadorRepository = jugadorRepository;
+        this.jugadorService = jugadorService;
     }
 
     @PostMapping("/jugadores")
     public ResponseEntity<Jugador> crearJugador(
             @RequestBody CrearJugadorRequest solicitud) {
 
-        int vida = solicitud.vida() == null ? 100 : solicitud.vida();
-        int reserva = solicitud.municionReserva() == null
-                ? 90 : solicitud.municionReserva();
-
-        Jugador jugador = new Jugador(
-                solicitud.nombre(), vida, reserva);
-
-        Jugador guardado = jugadorRepository.save(jugador);
+        Jugador guardado = jugadorService.crear(
+                solicitud.nombre(),
+                solicitud.vida(),
+                solicitud.municionReserva());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(guardado);
     }
 
     @GetMapping("/jugadores/{id}")
     public ResponseEntity<Jugador> buscarJugador(@PathVariable Long id) {
-        return jugadorRepository.findById(id)
+        return jugadorService.buscarPorId(id)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -56,9 +53,11 @@ public class SimulacionController {
     @GetMapping("/acciones/{armaId}")
     public ResponseEntity<Map<String, Object>> consultarAcciones(
             @PathVariable Long armaId) {
+
         return ResponseEntity.ok(
                 simulacionService.consultarAcciones(armaId));
     }
+
     @PostMapping("/disparar")
     public ResponseEntity<Map<String, Object>> disparar(
             @RequestParam Long rifleId,

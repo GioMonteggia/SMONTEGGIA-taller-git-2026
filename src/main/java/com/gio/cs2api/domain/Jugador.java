@@ -1,3 +1,4 @@
+
 package com.gio.cs2api.domain;
 
 import jakarta.persistence.Column;
@@ -7,8 +8,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
-
-import java.util.List;
 
 @Entity
 @Table(name = "jugadores_cs2")
@@ -31,6 +30,7 @@ public class Jugador {
     private Inventario inventario = new Inventario();
 
     protected Jugador() {
+        // Constructor requerido por JPA.
         this.inventario = new Inventario();
     }
 
@@ -39,78 +39,18 @@ public class Jugador {
     }
 
     public Jugador(String nombre, int vida, int municionReserva) {
-        if (nombre == null || nombre.isBlank()) {
-            throw new IllegalArgumentException(
-                    "El nombre del jugador no puede estar vacío"
-            );
-        }
-        if (vida <= 0) {
-            throw new IllegalArgumentException(
-                    "La vida inicial debe ser mayor que 0"
-            );
-        }
-        if (municionReserva < 0) {
-            throw new IllegalArgumentException(
-                    "La reserva de munición no puede ser negativa"
-            );
-        }
-
         this.nombre = nombre;
         this.vida = vida;
         this.municionReserva = municionReserva;
         this.inventario = new Inventario();
     }
 
-    public void recibirDano(int dano) {
-        if (dano <= 0) {
-            throw new IllegalArgumentException(
-                    "El daño recibido debe ser mayor que 0"
-            );
-        }
-        vida = Math.max(0, vida - dano);
-    }
+    public void actualizarEstadoCombate(
+            int vidaNueva,
+            int municionReservaNueva) {
 
-    public void consumirMunicionReserva(int cantidad) {
-        if (cantidad <= 0) {
-            throw new IllegalArgumentException(
-                    "La cantidad de munición debe ser mayor que 0"
-            );
-        }
-        if (cantidad > municionReserva) {
-            throw new MunicionAgotadaException(
-                    "El jugador no tiene suficiente munición de reserva"
-            );
-        }
-
-        municionReserva -= cantidad;
-    }
-
-    public void agregarArma(Arma arma) {
-        inventario.agregarArma(arma);
-    }
-
-    public String dispararArma(int posicion) {
-        return inventario.dispararArma(posicion);
-    }
-
-    public String recargarArma(int posicion) {
-        return inventario.recargarArma(posicion);
-    }
-
-    public List<String> dispararTodas() {
-        return inventario.dispararTodas();
-    }
-
-    public List<String> recargarTodas() {
-        return inventario.recargarTodas();
-    }
-
-    public List<String> mostrarTienda() {
-        return inventario.mostrarTienda();
-    }
-
-    public int cantidadArmas() {
-        return inventario.cantidadArmas();
+        this.vida = vidaNueva;
+        this.municionReserva = municionReservaNueva;
     }
 
     public Long getId() {

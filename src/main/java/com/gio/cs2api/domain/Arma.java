@@ -1,3 +1,4 @@
+
 package com.gio.cs2api.domain;
 
 import jakarta.persistence.Column;
@@ -40,8 +41,12 @@ public abstract class Arma implements AccionCombate {
         // Constructor requerido por JPA.
     }
 
-    public Arma(String nombre, float precio, int dano, float peso, int municionMax) {
-        validarDatos(nombre, precio, dano, peso, municionMax);
+    public Arma(
+            String nombre,
+            float precio,
+            int dano,
+            float peso,
+            int municionMax) {
 
         this.nombre = nombre;
         this.precio = precio;
@@ -49,34 +54,6 @@ public abstract class Arma implements AccionCombate {
         this.peso = peso;
         this.municionMax = municionMax;
         this.municionActual = municionMax;
-    }
-
-    private void validarDatos(
-            String nombre,
-            float precio,
-            int dano,
-            float peso,
-            int municionMax
-    ) {
-        if (nombre == null || nombre.isBlank()) {
-            throw new IllegalArgumentException("El nombre no puede estar vacío");
-        }
-
-        if (precio < 0) {
-            throw new IllegalArgumentException("El precio no puede ser negativo");
-        }
-
-        if (dano < 0) {
-            throw new IllegalArgumentException("El daño no puede ser negativo");
-        }
-
-        if (peso <= 0) {
-            throw new IllegalArgumentException("El peso debe ser mayor que 0");
-        }
-
-        if (municionMax <= 0) {
-            throw new IllegalArgumentException("La munición máxima debe ser mayor que 0");
-        }
     }
 
     public abstract String disparar();
@@ -89,6 +66,7 @@ public abstract class Arma implements AccionCombate {
     public String describirAcciones() {
         return obtenerNombre() + ": permite disparar y recargar.";
     }
+
     public String obtenerPrecio() {
         return "Precio: $" + precio;
     }
@@ -98,30 +76,19 @@ public abstract class Arma implements AccionCombate {
     }
 
     public void actualizarDesde(Arma otra) {
-        if (otra == null) {
-            throw new IllegalArgumentException("El arma actualizada no puede ser nula");
-        }
-
-        if (getClass() != otra.getClass()) {
-            throw new IllegalArgumentException(
-                    "No se puede cambiar el tipo de arma durante una actualización"
-            );
-        }
-
-        validarDatos(
-                otra.nombre,
-                otra.precio,
-                otra.dano,
-                otra.peso,
-                otra.municionMax
-        );
+        int municionAnterior = this.municionActual;
 
         this.nombre = otra.nombre;
         this.precio = otra.precio;
         this.dano = otra.dano;
         this.peso = otra.peso;
         this.municionMax = otra.municionMax;
-        this.municionActual = otra.municionActual;
+
+        // Conserva la munición al actualizar el arma.
+        // Si el nuevo cargador es menor, ajusta al máximo permitido.
+        this.municionActual = Math.min(
+                municionAnterior,
+                this.municionMax);
     }
 
     public Long getId() {
@@ -153,12 +120,6 @@ public abstract class Arma implements AccionCombate {
     }
 
     protected void consumirMunicion() {
-        if (municionActual <= 0) {
-            throw new MunicionAgotadaException(
-                    "No queda munición en " + nombre
-            );
-        }
-
-        municionActual--;
+    municionActual--;
     }
 }
