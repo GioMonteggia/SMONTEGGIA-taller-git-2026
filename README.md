@@ -264,8 +264,8 @@ Cuando una referencia de tipo `Arma` apunta a un rifle o a una pistola, Java eje
 **Simulación persistida.** `SimulacionService` coordina los disparos y las recargas, consulta los recursos necesarios y persiste los cambios del arma y del jugador. Un GET posterior permite comprobar que el nuevo estado quedó guardado en H2.
 
 ## Diagrama de clases
-
 ```mermaid
+
 classDiagram
     class Arma {
         <<abstract>>
@@ -273,10 +273,22 @@ classDiagram
         +recargar()
         +describirAcciones()
     }
+
     class Rifle
     class Pistola
     class Escopeta
-    class Granada
+
+    class Granada {
+        <<abstract>>
+        +disparar()
+        +efectoLanzamiento()
+    }
+
+    class GranadaFlash
+    class GranadaHumo
+    class GranadaIncendiaria
+    class GranadaSenuelo
+
     class Jugador
     class Inventario
 
@@ -290,6 +302,7 @@ classDiagram
     class ArmaRepository {
         <<interface>>
     }
+
     class JugadorRepository {
         <<interface>>
     }
@@ -319,6 +332,12 @@ classDiagram
     Arma <|-- Pistola
     Arma <|-- Escopeta
     Arma <|-- Granada
+
+    Granada <|-- GranadaFlash
+    Granada <|-- GranadaHumo
+    Granada <|-- GranadaIncendiaria
+    Granada <|-- GranadaSenuelo
+
     AccionCombate <|.. Arma
 
     Jugador o-- Inventario : contiene
@@ -348,6 +367,7 @@ classDiagram
     ExcepcionDominioCS2 <|-- ArmaNoEncontradaException
     ExcepcionDominioCS2 <|-- MunicionAgotadaException
     ApiExceptionHandler ..> ExcepcionDominioCS2 : traduce a HTTP
+
 ```
 
 ## Cómo ejecutar y probar
