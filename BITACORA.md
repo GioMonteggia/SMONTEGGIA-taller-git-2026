@@ -1,4 +1,4 @@
-﻿# Bitácora de uso de Inteligencia Artificial
+# Bitácora de uso de Inteligencia Artificial
 
 ## Herramienta utilizada
 
@@ -10,7 +10,7 @@ Durante el desarrollo de este proyecto se utilizó:
 
 ## Objetivo del uso de IA
 
-La inteligencia artificial fue utilizada como asistente durante el desarrollo, revisión, prueba y documentación del proyecto de API REST de armas de Counter-Strike 2.
+La inteligencia artificial fue utilizada como asistente durante el desarrollo, la revisión, las pruebas y la documentación del proyecto de API REST de armas de Counter-Strike 2.
 
 La IA se utilizó principalmente para:
 
@@ -18,7 +18,7 @@ La IA se utilizó principalmente para:
 - Organizar correctamente los paquetes `domain` y `rest.controller`.
 - Revisar y mejorar las clases del dominio.
 - Implementar y revisar herencia y clases abstractas.
-- Implementar y revisar overriding y overloading.
+- Implementar y revisar *overriding* y *overloading*.
 - Revisar constructores simples y sobrecargados.
 - Incorporar validaciones para mantener invariantes del dominio.
 - Revisar el encapsulamiento de los atributos.
@@ -26,8 +26,8 @@ La IA se utilizó principalmente para:
 - Implementar y revisar el inventario polimórfico.
 - Implementar la clase `Jugador`.
 - Verificar que el inventario pueda trabajar con diferentes tipos de `Arma` sin utilizar un `if` por cada tipo.
-- Centralizar el control de munición dentro del modelo de dominio.
-- Centralizar el control de cooldown de las granadas.
+- Revisar el control de munición y trasladar las validaciones de las operaciones de combate a los servicios correspondientes.
+- Gestionar el intervalo de reutilización de las granadas mediante `GranadaService`.
 - Probar los endpoints de la API.
 - Revisar y corregir errores de compilación.
 - Ejecutar y comprobar las pruebas automatizadas con Maven.
@@ -44,10 +44,10 @@ Los principales pedidos realizados al asistente estuvieron relacionados con:
 3. Revisar la clase abstracta `Arma` y sus clases derivadas.
 4. Verificar el uso correcto de `super(...)` en los constructores.
 5. Agregar validaciones para evitar estados inválidos en clases como `Pistola`, `Rifle` y `Escopeta`.
-6. Verificar la implementación de overriding mediante el método `disparar()`.
-7. Verificar la implementación de overloading mediante métodos como `disparar()` y `disparar(int distancia)`.
+6. Verificar la implementación de *overriding* mediante el método `disparar()`.
+7. Verificar la implementación de *overloading* mediante métodos como `disparar()` y `disparar(int distancia)`.
 8. Revisar los controladores REST y los endpoints disponibles.
-9. Revisar el diseño de `Granada` para centralizar el control de munición y cooldown.
+9. Revisar el diseño de `Granada` y la distribución del control de munición y del intervalo de reutilización entre el dominio y los servicios.
 10. Crear un inventario basado en `List<Arma>` para permitir el polimorfismo sin utilizar un `if` o `switch` por cada tipo de arma.
 11. Crear la clase `Jugador` para trabajar con el inventario de armas.
 12. Crear el `JugadorController` para demostrar las operaciones de disparar, recargar y mostrar la tienda.
@@ -97,13 +97,13 @@ Se verificó el rechazo de valores inválidos mediante:
 GET /armas/rifle?dano=0&cargador=30
 ```
 
-que produjo una respuesta HTTP 400 con el mensaje:
+Esta solicitud produjo una respuesta HTTP 400 con el mensaje:
 
 ```text
 El daño no puede ser 0 o negativo
 ```
 
-También se probaron los nuevos endpoints relacionados con el jugador y su inventario:
+También se probaron los endpoints relacionados con el jugador y su inventario:
 
 ```text
 GET /jugadores/demo
@@ -153,20 +153,19 @@ demostró que el inventario puede recorrer las armas mediante la referencia gene
 
 ## Resultado
 
-La utilización de IA permitió apoyar el análisis, implementación, revisión y documentación del proyecto.
+La utilización de IA permitió apoyar el análisis, la implementación, la revisión y la documentación del proyecto.
 
-La implementación final fue comprobada mediante pruebas automatizadas y pruebas manuales de los endpoints REST.
+La implementación de esta etapa fue comprobada mediante pruebas automatizadas y pruebas manuales de los endpoints REST.
 
-El resultado final mantiene la separación entre dominio y controladores REST, aplica encapsulamiento, herencia, polimorfismo, overriding, overloading, constructores sobrecargados e invariantes, además de incorporar un inventario polimórfico para el jugador.
-
+El proyecto aplica encapsulamiento, herencia, polimorfismo, *overriding*, *overloading*, constructores sobrecargados e invariantes, además de incorporar un inventario polimórfico para el jugador.
 
 ## Registro complementario: práctico POO-08 CRUD H2
 
 ### Herramienta y modelo
 
-- Asistente: ChatGPT.
-- Proveedor: OpenAI.
-- Modelo utilizado en esta asistencia: GPT-6.
+- **Asistente:** ChatGPT.
+- **Proveedor:** OpenAI.
+- **Modelo utilizado en esta asistencia:** GPT-6.
 
 ### Resumen de los pedidos realizados
 
@@ -187,3 +186,65 @@ Durante el proceso se analizaron errores de compilación, se corrigieron anotaci
 - Se verificó que intentar disparar con el cargador vacío produzca HTTP 409 sin consumir más munición ni aplicar daño adicional.
 
 Los comandos se ejecutaron en el entorno local del proyecto y sus resultados se revisaron en PowerShell. La asistencia de IA fue una herramienta de apoyo para el desarrollo, las correcciones y la documentación; el resultado final debe revisarse y entregarse desde el repositorio del estudiante.
+
+## Registro final de revisión y correcciones de POO-08
+
+### Reorganización de la lógica
+
+Durante la revisión de las observaciones de POO-08 se reorganizó el proyecto para separar las responsabilidades de los controladores, los servicios y los repositorios.
+
+Los cambios principales fueron:
+
+- Se incorporó `ArmaService` para centralizar las operaciones CRUD y las validaciones de armas persistidas.
+- Se incorporó `JugadorService` para gestionar la creación y consulta de jugadores persistidos.
+- Se reorganizó `SimulacionService` para coordinar las operaciones de disparo, recarga y persistencia.
+- Se incorporó `GranadaService` para gestionar el lanzamiento de granadas y el intervalo de reutilización.
+- Se incorporaron servicios específicos para las demostraciones de armas, rifles, jugadores e inventarios.
+- Se revisaron los controladores para que deleguen sus operaciones en los servicios correspondientes.
+- Se añadió al proyecto el módulo `spring-boot-h2console`, necesario para habilitar la consola web de H2 con la versión de Spring Boot utilizada.
+
+### Pruebas y verificaciones de POO-08
+
+Durante el desarrollo y la revisión final se utilizaron Maven e Insomnia para comprobar el funcionamiento del proyecto.
+
+Entre las verificaciones realizadas se incluyen:
+
+- Comprobación del servicio mediante `GET /`.
+- Creación, consulta, actualización y eliminación de armas persistidas.
+- Rechazo de solicitudes con datos inválidos mediante HTTP 400.
+- Respuesta HTTP 404 para armas inexistentes.
+- Conservación de la munición actual al actualizar un rifle mediante PUT.
+- Consulta de acciones mediante la interfaz `AccionCombate`.
+- Simulación de disparos y comprobación de los cambios en la munición y la vida del jugador.
+- Recarga del arma y actualización de la reserva de munición del jugador.
+- Rechazo de disparos sin munición mediante HTTP 409.
+- Comprobación de la persistencia de los jugadores en H2, incluso después de reiniciar la aplicación.
+- Acceso a la consola de H2 mediante `http://localhost:8080/h2-console`.
+
+Las seis pruebas automatizadas ejecutadas anteriormente finalizaron con `BUILD SUCCESS`, sin fallos ni errores. Este resultado corresponde a la ejecución registrada durante el desarrollo; cualquier cambio posterior debe comprobarse nuevamente mediante Maven.
+
+### Actualización de la documentación
+
+Se actualizó `README.md` para reflejar la organización por capas, los servicios y el diagrama de clases.
+
+También se actualizó `docs/ESPECIFICACION-ENTREGA.md` para documentar el modelo, las reglas de negocio, los endpoints, la configuración de H2, las instrucciones de ejecución y las pruebas realizadas.
+
+Se revisó esta bitácora para diferenciar los pedidos de la etapa inicial del proyecto y la refactorización de POO-08.
+
+### Referencia al código publicado
+
+El commit de implementación que contiene los cambios de código y servicios de POO-08 es:
+
+https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026/commit/5861daf
+
+Este enlace corresponde al commit de implementación del código. El enlace definitivo de entrega debe apuntar al commit publicado que incluya todas las correcciones finales del código y de la documentación.
+
+## Resultado final de la bitácora
+
+La inteligencia artificial se utilizó como herramienta de apoyo para analizar requisitos, revisar la arquitectura, proponer cambios, identificar problemas y preparar la documentación.
+
+Durante el trabajo se revisaron conceptos de programación orientada a objetos, como encapsulamiento, herencia, polimorfismo, sobrecarga, sobreescritura, clases abstractas e interfaces.
+
+En POO-08 se incorporó la persistencia de armas y jugadores mediante Spring Data JPA y H2, se reorganizaron las operaciones mediante servicios y se verificaron manualmente los principales casos de éxito y error con Insomnia.
+
+Los cambios de código de la refactorización se publicaron en la rama `poo-08-crud-h2`. La documentación, las pruebas y el enlace de entrega deben mantenerse alineados con la versión final publicada del repositorio.
