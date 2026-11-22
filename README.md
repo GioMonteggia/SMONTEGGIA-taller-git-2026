@@ -2,71 +2,109 @@
 
 ## Objetivo
 
-Este proyecto implementa una API REST con Java 21 y Spring Boot para administrar armas de Counter-Strike 2, persistir su estado en H2 y ejecutar simulaciones de combate. Aplica encapsulamiento, herencia, polimorfismo, interfaces, excepciones de dominio y persistencia con Spring Data JPA.
+Este proyecto implementa una API REST con Java 21 y Spring Boot para administrar armas de Counter-Strike 2, persistir su estado en H2 y ejecutar simulaciones de combate. El proyecto demuestra encapsulamiento, herencia, polimorfismo, sobrecarga, sobreescritura, interfaces, excepciones de dominio, servicios y persistencia con Spring Data JPA.
 
 ## Tecnologías
 
 - Java 21
-- Spring Boot y Spring Web
+- Spring Boot 4.1.1
+- Spring Web MVC
 - Spring Data JPA
-- H2
+- H2 y consola web H2
 - Maven
 - JUnit 5
 - Git y GitHub
 - Insomnia
 - Mermaid
+- Licencia Apache 2.0
 
 ## Modelo y persistencia
 
-La familia principal está formada por `Arma`, clase padre abstracta, y sus clases hijas `Rifle` y `Pistola`. Se utiliza la estrategia de herencia JPA `SINGLE_TABLE`: las entidades se almacenan en una tabla compartida y se distinguen mediante la columna discriminadora `tipo_arma`.
+La familia principal de armas persistidas está formada por `Arma`, una clase abstracta, y sus clases hijas `Rifle` y `Pistola`. Se utiliza la estrategia de herencia JPA `SINGLE_TABLE`: las entidades de esta familia se guardan en una tabla compartida y se distinguen mediante la columna discriminadora `tipo_arma`.
 
-La clase `Jugador` también se persiste y representa al jugador que recibe daño y mantiene una reserva de munición. `ArmaRepository` administra la familia de armas y `JugadorRepository` administra los jugadores mediante Spring Data JPA.
+Los valores de discriminación de las entidades persistidas son `RIFLE` y `PISTOLA`.
 
-Los identificadores son gestionados por la persistencia. Se utilizan para consultar, actualizar y eliminar los recursos.
+La clase `Jugador` también se persiste en la tabla `jugadores_cs2`. Representa al jugador que recibe daño y mantiene una reserva de munición.
+
+El inventario de demostración de `Jugador` está marcado con `@Transient`, por lo que no se persiste como parte de la entidad JPA. Las operaciones del inventario didáctico trabajan con objetos creados para las demostraciones.
+
+Los identificadores son gestionados por JPA y se utilizan para consultar, actualizar y eliminar recursos persistidos.
 
 ## Organización por capas
 
 El proyecto separa los controladores REST, los servicios y los repositorios.
 
-- `ArmaCrudController` recibe las solicitudes HTTP del CRUD de armas y delega las operaciones en `ArmaService`.
-- `ArmaService` valida los datos de entrada y coordina la creación, consulta, actualización y eliminación de armas utilizando `ArmaRepository`.
+- `ArmaCrudController` recibe las solicitudes HTTP del CRUD persistente y delega las operaciones en `ArmaService`.
+- `ArmaService` valida los datos y coordina la creación, consulta, actualización y eliminación de armas mediante `ArmaRepository`.
 - `SimulacionController` delega las operaciones de combate en `SimulacionService` y las operaciones de jugadores en `JugadorService`.
-- `SimulacionService` coordina las reglas de disparo y recarga, consulta los recursos necesarios y persiste los cambios de la simulación.
-- `JugadorService` centraliza la creación y consulta de jugadores mediante `JugadorRepository`.
-- Los servicios de demostración separan las operaciones didácticas de la lógica de los controladores.
+- `SimulacionService` comprueba las condiciones de la simulación, calcula el daño, coordina los disparos y las recargas y persiste los cambios.
+- `JugadorService` valida y crea jugadores, y permite consultarlos mediante `JugadorRepository`.
+- `ArmaDemostracionService`, `RifleDemostracionService` y `JugadorDemostracionService` organizan las operaciones didácticas de POO.
+- `InventarioService` centraliza las operaciones del inventario de demostración.
+- `GranadaService` gestiona el lanzamiento de granadas y su intervalo de reutilización.
 
-Los controladores no acceden directamente a los repositorios. La validación de las solicitudes y la coordinación de las operaciones se realizan en los servicios correspondientes.
+Los controladores de las operaciones de armas, jugadores y simulación delegan el trabajo en los servicios correspondientes. Los servicios utilizan los repositorios cuando necesitan consultar o modificar datos persistidos.
 
 ## Reglas de negocio
 
-1. **Daño y disparo:** durante la simulación, `SimulacionService` calcula el daño efectivo según el daño base, la distancia y la precisión del rifle. El disparo consume una bala y reduce la vida del jugador. Los cambios se guardan en H2.
-2. **Recarga:** la recarga completa el cargador utilizando la reserva de munición del jugador. La operación verifica que haya reserva suficiente y persiste los cambios del arma y del jugador.
+### Disparo
 
-Estas operaciones se coordinan mediante servicios y transacciones para mantener coherentes los cambios de los recursos implicados.
+`SimulacionService` comprueba que la distancia sea válida, que el arma exista, que sea un rifle y que tenga munición disponible. También verifica que exista el jugador objetivo antes de completar la simulación.
 
-La actualización de un arma mediante PUT conserva la munición actual cuando sigue siendo compatible con la capacidad del cargador actualizado. Por ejemplo, si un rifle tenía 29 balas de un máximo de 30, cambiar su nombre y precio no debe reiniciar automáticamente la munición a 30.
+El daño efectivo depende del daño base, la distancia y la precisión del rifle. Se utiliza el siguiente factor de distancia:
+
+```java
+Math.max(0.5f, 1f - distancia / 100f)
+```
+
+El daño se calcula redondeando el producto del daño base, el factor de distancia y la precisión.
+
+Por ejemplo, con un rifle de daño base 36, precisión 0,85 y distancia de 50 metros, el daño efectivo es 15 puntos. El servicio consume una bala, reduce la vida del jugador sin dejarla por debajo de cero y persiste los estados modificados.
+
+### Recarga
+
+`SimulacionService` calcula cuántas balas necesita el cargador para alcanzar su capacidad máxima. La operación utiliza la reserva del jugador y guarda tanto el arma como el jugador.
+
+- Si el cargador está lleno, la operación se rechaza con HTTP 400.
+- Si no queda munición en el arma al intentar disparar, la operación se rechaza con HTTP 409.
+- Si la reserva del jugador es insuficiente para completar una recarga, se rechaza la operación.
+- Una recarga correcta resta de la reserva la cantidad necesaria y restaura la munición del cargador.
+
+Estas comprobaciones y la coordinación de los cambios persistidos se encuentran en la capa de servicios. Los métodos del dominio realizan las modificaciones de estado que corresponden a las acciones solicitadas.
+
+### Actualización mediante PUT
+
+El endpoint PUT actualiza un arma existente sin cambiar su subtipo. La actualización conserva la munición actual si sigue siendo compatible con la capacidad del cargador.
+
+Por ejemplo, si un rifle tiene 29 balas de una capacidad máxima de 30, cambiar su nombre y su precio no debe reiniciar la munición a 30. Si se reduce la capacidad máxima por debajo de la munición existente, la cantidad actual se ajusta al nuevo máximo.
 
 ## Interfaz de dominio
 
-`AccionCombate` define las operaciones comunes de combate: disparar, recargar y describir acciones. `Arma` implementa esta interfaz, y `Rifle` y `Pistola` heredan su contrato y proporcionan el comportamiento específico de sus subtipos.
+`AccionCombate` define las operaciones comunes:
 
-El endpoint `GET /api/simulacion/acciones/{armaId}` consulta las acciones disponibles mediante la interfaz.
+- `disparar()`
+- `recargar()`
+- `describirAcciones()`
+
+`Arma` implementa esta interfaz. `Rifle` y `Pistola` heredan el contrato y proporcionan implementaciones específicas de sus acciones.
+
+El endpoint `GET /api/simulacion/acciones/{armaId}` consulta un arma persistida mediante una referencia de tipo `AccionCombate` y devuelve sus acciones disponibles.
 
 ## Endpoints REST
 
 La dirección base de la aplicación es `http://localhost:8080`.
 
-### CRUD de armas
+### 1. CRUD persistente de armas
+
+El CRUD de `/api/armas` admite rifles y pistolas.
 
 | Método | Ruta | Propósito |
 |---|---|---|
-| POST | `/api/armas` | Crear un arma. |
-| GET | `/api/armas` | Listar armas. |
+| POST | `/api/armas` | Crear un arma persistida. |
+| GET | `/api/armas` | Listar las armas persistidas. |
 | GET | `/api/armas/{id}` | Consultar un arma por ID. |
 | PUT | `/api/armas/{id}` | Actualizar un arma existente. |
 | DELETE | `/api/armas/{id}` | Eliminar un arma. |
-
-El CRUD persistente admite rifles y pistolas.
 
 Ejemplo de cuerpo para crear un rifle:
 
@@ -80,26 +118,20 @@ Ejemplo de cuerpo para crear un rifle:
 }
 ```
 
-La API valida los datos recibidos. Entre otras condiciones, rechaza nombres vacíos, valores no válidos, cargadores inválidos, tipos no admitidos y datos numéricos incorrectos.
+Para crear una pistola, se utiliza `"tipo": "pistola"`. Si se omiten `dano` o `cargador`, el servicio utiliza los valores predeterminados del subtipo. Los campos `tipo`, `nombre` y `precio` son obligatorios.
 
-Respuestas principales del CRUD:
+El servicio rechaza nombres vacíos, tipos no admitidos y valores numéricos incorrectos o fuera de los límites permitidos.
 
-- HTTP 201: recurso creado.
-- HTTP 200: consulta o actualización exitosa.
-- HTTP 204: eliminación exitosa sin cuerpo de respuesta.
-- HTTP 400: datos de entrada inválidos.
-- HTTP 404: arma inexistente.
-
-### Jugadores y simulación
+### 2. Jugadores y simulación persistida
 
 | Método | Ruta | Propósito |
 |---|---|---|
 | POST | `/api/simulacion/jugadores` | Crear un jugador persistido. |
-| GET | `/api/simulacion/jugadores/{id}` | Consultar un jugador. |
-| GET | `/api/simulacion/acciones/{armaId}` | Consultar las acciones del arma. |
+| GET | `/api/simulacion/jugadores/{id}` | Consultar un jugador por ID. |
+| GET | `/api/simulacion/acciones/{armaId}` | Consultar las acciones de un arma. |
 | POST | `/api/simulacion/disparar?rifleId={id}&jugadorId={id}&distancia={valor}` | Disparar un rifle contra un jugador. |
 | POST | `/api/simulacion/recargar?armaId={id}&jugadorId={id}` | Recargar usando la reserva del jugador. |
-| POST | `/api/simulacion/acciones/{armaId}/recargar?jugadorId={id}` | Ejecutar la recarga mediante el servicio de acciones. |
+| POST | `/api/simulacion/acciones/{armaId}/recargar?jugadorId={id}` | Recargar mediante el endpoint de acciones. |
 
 Ejemplo para crear un jugador:
 
@@ -111,20 +143,55 @@ Ejemplo para crear un jugador:
 }
 ```
 
-Primero se debe crear el arma y el jugador, y guardar los identificadores que devuelven las respuestas. Después se pueden realizar las operaciones de simulación y consultar nuevamente el estado para verificar la persistencia.
+Si se omiten la vida o la reserva de munición, el servicio utiliza los valores predeterminados configurados. La vida inicial debe ser mayor que cero y la reserva no puede ser negativa.
+
+Se debe crear primero el arma y el jugador, guardar los identificadores devueltos y utilizarlos en las solicitudes de simulación. Después de cada disparo o recarga, se pueden consultar de nuevo ambos recursos para comprobar los cambios persistidos.
+
+### 3. Endpoints didácticos de POO
+
+Además de las operaciones persistentes, el proyecto conserva endpoints de demostración para mostrar herencia, polimorfismo y el trabajo con diferentes tipos de armas.
+
+| Método | Ruta | Propósito |
+|---|---|---|
+| GET | `/armas/{tipo}` | Crear un objeto de demostración y ejecutar su acción. |
+| GET | `/polimorfismo` | Mostrar el comportamiento de un rifle y una pistola mediante polimorfismo. |
+| GET | `/rifles/{nombre}` | Consultar datos de un rifle creado para la demostración. |
+| GET | `/rifles/{nombre}/disparar` | Simular uno o más disparos de un rifle de demostración. |
+| GET | `/jugadores/demo` | Mostrar un jugador y las armas de su inventario de demostración. |
+| GET | `/jugadores/demo/disparar` | Disparar todas las armas del inventario de demostración. |
+| GET | `/jugadores/demo/recargar` | Recargar las armas del inventario de demostración. |
+| GET | `/jugadores/demo/tienda` | Mostrar los productos del inventario de demostración. |
+| GET | `/jugadores/demo/disparar/{posicion}` | Disparar el arma ubicada en una posición del inventario. |
+
+Estos endpoints son demostraciones de POO y trabajan con objetos creados durante cada solicitud. No deben confundirse con el CRUD persistente de `/api/armas`.
+
+En `/armas/{tipo}`, los tipos admitidos por el servicio de demostración incluyen `rifle`, `pistola`, `escopeta`, `subfusil`, `francotirador`, `humo`, `flash`, `incendiaria` y `senuelo`.
+
+El endpoint `/rifles/{nombre}/disparar` admite los parámetros `precio`, `cargador`, `distancia` y `veces`. El número de disparos debe estar entre 1 y 50 y no puede superar la munición del cargador.
 
 ## Excepciones y respuestas HTTP
 
-La jerarquía de excepciones contiene una clase base, `ExcepcionDominioCS2`, y dos clases específicas:
+La jerarquía de excepciones de dominio contiene una clase base, `ExcepcionDominioCS2`, y dos clases específicas:
 
 - `ArmaNoEncontradaException`: representa un arma inexistente y se traduce en HTTP 404.
-- `MunicionAgotadaException`: representa una operación que no puede realizarse por falta de munición y se traduce en HTTP 409.
+- `MunicionAgotadaException`: representa una operación rechazada por falta de munición y se traduce en HTTP 409.
 
-`ApiExceptionHandler` centraliza la traducción de excepciones a respuestas HTTP. Los argumentos inválidos y las solicitudes con datos incorrectos se responden con HTTP 400.
+`ApiExceptionHandler`, mediante `@RestControllerAdvice`, centraliza la traducción de excepciones a respuestas HTTP. Las excepciones generales de dominio y los argumentos inválidos se traducen a HTTP 400.
+
+Los errores se devuelven como objetos JSON con la clave `error` y un mensaje descriptivo.
+
+| Situación | Respuesta esperada |
+|---|---|
+| Recurso creado correctamente | HTTP 201 |
+| Consulta o actualización correcta | HTTP 200 |
+| Eliminación correcta | HTTP 204 |
+| Datos inválidos o cargador lleno | HTTP 400 |
+| Arma inexistente | HTTP 404 |
+| Munición agotada al disparar | HTTP 409 |
 
 ## Configuración de H2
 
-La configuración se encuentra en `src/main/resources/application.properties`.
+La configuración está en `src/main/resources/application.properties`.
 
 | Propiedad | Función |
 |---|---|
@@ -142,13 +209,13 @@ La consola H2 está disponible en:
 
 `http://localhost:8080/h2-console`
 
-Los datos de conexión son:
+Datos de conexión:
 
 - **JDBC URL:** `jdbc:h2:file:./data/cs2db;DB_CLOSE_ON_EXIT=FALSE`
 - **Usuario:** `sa`
 - **Contraseña:** vacía
 
-El proyecto incluye el módulo de Spring Boot necesario para habilitar la consola H2. Esta configuración está destinada al desarrollo local.
+El proyecto incluye el módulo `spring-boot-h2console` necesario para habilitar la consola web con la versión de Spring Boot utilizada.
 
 El directorio `data/` está excluido de Git mediante `.gitignore`, porque contiene los archivos de la base de datos local.
 
@@ -160,41 +227,41 @@ La sobrecarga consiste en declarar métodos o constructores con el mismo nombre 
 
 En `Rifle` existen los constructores `Rifle(String nombre, float precio)` y `Rifle(String nombre, float precio, int dano, int cargador)`. El primero delega en el segundo utilizando valores predeterminados.
 
-En `Pistola` también existen constructores con diferentes listas de parámetros.
+`Pistola` también dispone de dos constructores con diferentes listas de parámetros.
 
-Ambas clases disponen de los métodos `disparar()` y `disparar(int distancia)`. El primer método permite disparar sin especificar una distancia; el segundo recibe una distancia explícita. Como las listas de parámetros son diferentes, se trata de sobrecarga.
+Tanto `Rifle` como `Pistola` tienen los métodos `disparar()` y `disparar(int distancia)`. Como las listas de parámetros son diferentes, se trata de sobrecarga.
 
-Las validaciones de las solicitudes HTTP se centralizan en los servicios. Los constructores sin argumentos tienen visibilidad `protected` para permitir que JPA reconstruya las entidades sin ofrecerlos como constructores normales de negocio.
+Los constructores sin argumentos de las entidades persistidas tienen visibilidad `protected` para permitir que JPA reconstruya las entidades sin ofrecerlos como constructores normales de negocio.
 
 ### Sobreescritura (overriding)
 
-La clase abstracta `Arma` declara `public abstract String disparar()`. Las clases `Rifle` y `Pistola` implementan el método con la misma firma y utilizan `@Override`.
+La clase abstracta `Arma` declara el método abstracto `disparar()`. `Rifle` y `Pistola` implementan ese método con la misma firma y utilizan `@Override`.
 
-Cada clase hija proporciona su implementación específica. `Rifle.disparar()` delega en `disparar(100)`, mientras que `Pistola.disparar()` utiliza el comportamiento específico de la pistola.
-
-La sobrecarga utiliza diferentes listas de parámetros; la sobreescritura redefine en una clase hija un método heredado con la misma firma. Cuando una referencia de tipo `Arma` apunta a un rifle o una pistola, Java ejecuta la implementación correspondiente al objeto concreto.
+Cuando una referencia de tipo `Arma` apunta a un rifle o a una pistola, Java ejecuta la implementación correspondiente al objeto concreto. De esta forma se demuestra el polimorfismo.
 
 ## Respuestas a las preguntas de diseño
 
-**Recurso y verbo HTTP.** El sustantivo principal de la API es el arma y la colección es `/api/armas`; POST crea, GET consulta, PUT actualiza y DELETE elimina los recursos.
+**Recurso y verbo HTTP.** El recurso principal del CRUD persistente es el arma y su colección es `/api/armas`. POST crea, GET consulta, PUT actualiza y DELETE elimina los recursos.
 
-**Identidad.** El campo `id` es la clave primaria y JPA lo genera mediante `GenerationType.IDENTITY`. El cliente omite el ID al crear un recurso y utiliza el valor devuelto para las operaciones posteriores.
+**Identidad.** El campo `id` es la clave primaria y JPA lo genera mediante `GenerationType.IDENTITY`. El cliente omite el ID al crear y utiliza el identificador devuelto para las operaciones posteriores.
 
-**Herencia, tablas y tipo de arma.** `Arma` es abstracta y `Rifle` y `Pistola` son sus clases hijas. Se utiliza `SINGLE_TABLE` para guardar la familia en una tabla compartida y distinguir los tipos mediante la columna `tipo_arma`. Al crear un arma, el JSON incluye `tipo` con valor `rifle` o `pistola`, y el servicio construye la clase concreta correspondiente.
+**Herencia, tablas y tipo de arma.** `Arma` es abstracta, mientras que `Rifle` y `Pistola` son entidades hijas. Se utiliza `SINGLE_TABLE` para guardar la familia persistida en una tabla compartida y distinguir los subtipos mediante `tipo_arma`.
 
-**Interfaz y repositorio.** `ArmaRepository` extiende `JpaRepository<Arma, Long>`, de modo que Spring Data JPA proporciona las operaciones comunes. El controlador CRUD depende de `ArmaService`, y este servicio utiliza el repositorio. Así se separan la entrada HTTP, la lógica de negocio y la persistencia.
+**Interfaz y repositorio.** `ArmaRepository` extiende `JpaRepository<Arma, Long>` y `JugadorRepository` extiende `JpaRepository<Jugador, Long>`. Spring Data JPA proporciona las operaciones comunes. Los controladores delegan en los servicios y estos utilizan los repositorios para acceder a la persistencia.
 
-**Protocolo del dominio.** `AccionCombate` declara `disparar()`, `recargar()` y `describirAcciones()`. `Arma` implementa el contrato y sus subtipos proporcionan el comportamiento heredado o específico. El endpoint `GET /api/simulacion/acciones/{armaId}` permite consultar las acciones disponibles.
+**Cambio de motor de persistencia.** El uso de interfaces de repositorio y Spring Data JPA separa las operaciones de persistencia de los controladores y de las reglas de simulación. Cambiar H2 por otro motor requiere ajustar la dependencia del controlador JDBC y la configuración de conexión y comprobar la compatibilidad del esquema, sin trasladar las operaciones HTTP a los servicios.
 
-**Encapsulamiento e invariantes.** Los atributos del dominio son privados y no se exponen mediante setters públicos. La validación de las solicitudes se centraliza en los servicios. Para comprobar que un POST inválido no agrega datos, se consulta la colección con `GET /api/armas`, se envía un POST inválido y se vuelve a consultar para confirmar que la cantidad de armas persistidas no aumentó.
+**Interfaz de comportamiento.** `AccionCombate` declara las operaciones comunes de combate. `Arma` implementa la interfaz y sus subtipos aportan sus comportamientos específicos. `GET /api/simulacion/acciones/{armaId}` utiliza esta abstracción sobre un arma persistida.
 
-**PUT y PATCH.** La API usa PUT para actualizar un arma existente. La actualización modifica los atributos permitidos del recurso y conserva la munición actual siempre que sea compatible con la capacidad del cargador. No se ofrece un endpoint PATCH independiente.
+**Encapsulamiento e invariantes.** Los atributos del dominio se mantienen privados y no se exponen mediante setters públicos. Los servicios validan las solicitudes antes de efectuar las operaciones de negocio. Un POST inválido debe responder HTTP 400 y no aumentar la cantidad de armas persistidas.
 
-**DELETE.** `DELETE /api/armas/{id}` elimina el registro mediante el servicio de armas y devuelve HTTP 204. Si el arma no existe, se responde con HTTP 404.
+**PUT y PATCH.** La API utiliza PUT para actualizar un arma existente. El cuerpo incluye `tipo`, `nombre` y `precio`; los parámetros `dano` y `cargador` pueden tomar valores predeterminados si se omiten. No existe un endpoint PATCH independiente.
 
-**Simulación persistida.** `SimulacionService` coordina el disparo o la recarga, consulta los recursos necesarios y persiste el arma y el jugador modificados. Un GET posterior permite comprobar que el nuevo estado quedó guardado en H2.
+**DELETE físico.** `DELETE /api/armas/{id}` elimina el registro persistido y devuelve HTTP 204. Si el arma no existe, se responde con HTTP 404.
 
-**Excepciones y JSON de error.** `ExcepcionDominioCS2` es la clase base. `ArmaNoEncontradaException` representa un arma inexistente y devuelve HTTP 404; `MunicionAgotadaException` representa la falta de munición y devuelve HTTP 409. `ApiExceptionHandler`, mediante `@RestControllerAdvice`, traduce las excepciones a respuestas JSON con la clave `error` y el mensaje correspondiente.
+**Excepciones no comprobadas.** `ExcepcionDominioCS2` hereda de `RuntimeException`. Sus excepciones específicas permiten distinguir un arma inexistente y una operación rechazada por falta de munición.
+
+**Simulación persistida.** `SimulacionService` coordina los disparos y las recargas, consulta los recursos necesarios y persiste los cambios del arma y del jugador. Un GET posterior permite comprobar que el nuevo estado quedó guardado en H2.
 
 ## Diagrama de clases
 
@@ -202,27 +269,47 @@ La sobrecarga utiliza diferentes listas de parámetros; la sobreescritura redefi
 classDiagram
     class Arma {
         <<abstract>>
+        +disparar()
+        +recargar()
+        +describirAcciones()
     }
     class Rifle
     class Pistola
+    class Escopeta
+    class Granada
     class Jugador
+    class Inventario
+
     class AccionCombate {
         <<interface>>
         +disparar()
         +recargar()
         +describirAcciones()
     }
+
     class ArmaRepository {
         <<interface>>
     }
     class JugadorRepository {
         <<interface>>
     }
+
+    class IndexController
+    class ArmaController
+    class RifleController
+    class JugadorController
     class ArmaCrudController
+    class SimulacionController
+
+    class ArmaDemostracionService
+    class RifleDemostracionService
+    class JugadorDemostracionService
+    class InventarioService
+    class GranadaService
     class ArmaService
     class JugadorService
-    class SimulacionController
     class SimulacionService
+
     class ApiExceptionHandler
     class ExcepcionDominioCS2
     class ArmaNoEncontradaException
@@ -230,17 +317,34 @@ classDiagram
 
     Arma <|-- Rifle
     Arma <|-- Pistola
+    Arma <|-- Escopeta
+    Arma <|-- Granada
     AccionCombate <|.. Arma
+
+    Jugador o-- Inventario : contiene
+    Inventario o-- Arma : agrupa
+
     ArmaRepository --> Arma : persiste
     JugadorRepository --> Jugador : persiste
+
+    ArmaController --> ArmaDemostracionService : delega
+    RifleController --> RifleDemostracionService : delega
+    JugadorController --> JugadorDemostracionService : delega
     ArmaCrudController --> ArmaService : delega
-    ArmaService --> ArmaRepository : consulta y guarda
+
     SimulacionController --> SimulacionService : delega
     SimulacionController --> JugadorService : delega
+
+    ArmaDemostracionService --> GranadaService : utiliza
+    JugadorDemostracionService --> InventarioService : utiliza
+    InventarioService --> GranadaService : utiliza
+
+    ArmaService --> ArmaRepository : consulta y guarda
+    JugadorService --> JugadorRepository : consulta y guarda
     SimulacionService --> ArmaRepository : consulta y guarda
     SimulacionService --> JugadorRepository : consulta y guarda
-    JugadorService --> JugadorRepository : consulta y guarda
     SimulacionService ..> AccionCombate : utiliza
+
     ExcepcionDominioCS2 <|-- ArmaNoEncontradaException
     ExcepcionDominioCS2 <|-- MunicionAgotadaException
     ApiExceptionHandler ..> ExcepcionDominioCS2 : traduce a HTTP
@@ -288,38 +392,42 @@ En Linux o macOS:
 2. Seleccionar la opción para importar datos.
 3. Importar `insomnia/CS2-API-2026.json` desde la raíz del repositorio.
 4. Configurar `base_url` con el valor `http://localhost:8080`.
-5. Crear primero el arma y el jugador, y guardar los IDs que devuelvan las respuestas para utilizarlos en las solicitudes siguientes.
+5. Crear el arma y el jugador necesarios para la simulación y guardar los IDs devueltos para las solicitudes siguientes.
 
-La colección incluye la solicitud `GET /`, que permite comprobar que el servicio está disponible y responde:
+La colección incluye la solicitud `GET /`, que comprueba la disponibilidad del servicio y devuelve:
 
 `API de armas de Counter-Strike 2 funcionando`
 
 ### Orden recomendado de pruebas
 
-1. Ejecutar `GET /` para comprobar que el servicio está disponible.
+1. Ejecutar `GET /` y comprobar HTTP 200.
 2. Ejecutar `POST /api/armas` con datos válidos y guardar el ID devuelto.
-3. Ejecutar `GET /api/armas` y `GET /api/armas/{id}` para confirmar que el arma creada se encuentra persistida.
-4. Ejecutar `PUT /api/armas/{id}` y consultar otra vez para comprobar que el cambio se guardó y que se conservó la munición actual.
+3. Ejecutar `GET /api/armas` y `GET /api/armas/{id}` para comprobar la persistencia del arma.
+4. Ejecutar `PUT /api/armas/{id}` y consultar otra vez para verificar que se actualizó y que se conservó la munición actual.
 5. Enviar un POST inválido, por ejemplo con el nombre vacío. Debe responder HTTP 400 y la colección debe conservar la misma cantidad de armas.
 6. Crear un jugador mediante `POST /api/simulacion/jugadores` y guardar su ID.
-7. Ejecutar `GET /api/simulacion/acciones/{armaId}` para probar el endpoint que utiliza `AccionCombate`.
-8. Ejecutar un disparo usando `/api/simulacion/disparar` y consultar de nuevo el arma y el jugador para comprobar los cambios persistidos en la munición y en la vida.
-9. Ejecutar una recarga usando `/api/simulacion/recargar` y consultar de nuevo el arma y el jugador para comprobar los cambios en el cargador y en la reserva.
+7. Ejecutar `GET /api/simulacion/acciones/{armaId}` para consultar las acciones mediante `AccionCombate`.
+8. Ejecutar un disparo usando `/api/simulacion/disparar` y consultar de nuevo el arma y el jugador para verificar los cambios de munición y vida.
+9. Ejecutar una recarga y consultar de nuevo el arma y el jugador para verificar los cambios del cargador y la reserva.
 10. Consultar un ID inexistente, por ejemplo mediante `GET /api/armas/999999`, y comprobar HTTP 404.
-11. Agotar la munición de un rifle de prueba e intentar disparar otra vez. Comprobar que la respuesta es HTTP 409 y que el disparo fallido no cambia la vida ni la munición.
-12. Ejecutar `DELETE /api/armas/{id}` sobre un recurso de prueba y consultar luego el mismo ID para comprobar que ya no existe.
+11. Agotar la munición de un rifle de prueba e intentar disparar otra vez. Debe responder HTTP 409 y el disparo fallido no debe modificar la vida ni la munición.
+12. Ejecutar `DELETE /api/armas/{id}` sobre un recurso de prueba y consultar después el mismo ID para comprobar que ya no existe.
 
-Las pruebas de simulación deben utilizar IDs reales y un estado del arma preparado para cada caso. La colección está versionada en `insomnia/CS2-API-2026.json`.
+Las pruebas deben utilizar IDs reales y un estado del arma preparado para cada caso. La colección está versionada en `insomnia/CS2-API-2026.json`.
 
 ### Consultar la base H2
 
-Abrir `http://localhost:8080/h2-console` y conectarse con la URL JDBC:
+Abrir `http://localhost:8080/h2-console` y conectarse con los siguientes datos:
 
-`jdbc:h2:file:./data/cs2db;DB_CLOSE_ON_EXIT=FALSE`
+- **JDBC URL:** `jdbc:h2:file:./data/cs2db;DB_CLOSE_ON_EXIT=FALSE`
+- **Usuario:** `sa`
+- **Contraseña:** vacía
 
-El usuario es `sa` y la contraseña está vacía, de acuerdo con la configuración local del proyecto.
+Las propiedades están en `src/main/resources/application.properties`. El directorio `data/` está excluido de Git para no versionar la base de datos local.
 
-Las propiedades están en `src/main/resources/application.properties`. El directorio `data/` está excluido de Git para no versionar la base local.
+## Licencia
+
+El proyecto incluye el archivo `LICENSE` con la licencia Apache 2.0.
 
 ## Commit de implementación
 
