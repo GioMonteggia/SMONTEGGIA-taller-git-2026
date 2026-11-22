@@ -1,5 +1,7 @@
 # Especificaciones: API REST de armas de Counter-Strike 2
 
+> **Nota:** Este documento corresponde a la etapa inicial POO-06. Para consultar la implementación actualizada de POO-08, incluidas la arquitectura por servicios, la persistencia H2 y las correcciones realizadas, consultar `README.md` y `docs/ESPECIFICACION-ENTREGA.md`. Las referencias técnicas y al commit de este documento corresponden a la etapa inicial y no deben considerarse la versión definitiva de POO-08.
+
 **Alumno:** Sergio Monteggia  
 **Asignatura:** Lenguaje de Programación 3 — ejercicio POO-06  
 **Proyecto:** SMONTEGGIA-taller-git-2026  
