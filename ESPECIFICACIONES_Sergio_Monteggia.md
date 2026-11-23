@@ -4,7 +4,7 @@
 
 **Alumno:** Sergio Monteggia  
 **Asignatura:** Lenguaje de Programación 3 — ejercicio POO-06  
-**Proyecto:** INICIALES-taller-git-2026  
+**Proyecto:** SMONTEGGIA-taller-git-2026  
 **Repositorio:**  
 https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026
 
