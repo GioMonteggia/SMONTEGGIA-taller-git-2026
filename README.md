@@ -97,7 +97,7 @@ Cada servicio se clona y se arranca desde su propio repositorio con `./mvnw spri
 ```powershell
 # Una sola vez: clonar los tres repositorios
 git clone https://github.com/LTP22/ltauber-tp-lp3-2026.git a3-tauber
-git clone https://github.com/GioMonteggia/INICIALES-taller-git-2026.git a1-monteggia
+git clone https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026.git a1-monteggia
 git clone https://github.com/cesarraa/crr-taller-git-2026.git a2-ramirez
 cd a1-monteggia
 git checkout poo-09-apis-cruzadas
@@ -138,7 +138,7 @@ Las 26 pruebas automatizadas pasaron con `Failures: 0, Errors: 0`. En la reverif
 
 Importar `insomnia/POO-09-APIS-CRUZADAS.json`. El entorno trae `a1_base_url`, `a2_base_url`, `a3_base_url` y los IDs a reemplazar. Orden: consultar los tres OpenAPI; crear jugador y rifles; dejar 29/30 el rifle del camino feliz; ejecutar el escenario feliz; listar jugadas; ejecutar los dos rechazos y volver a listar para comprobar que el H2 quedó igual. La colección incluye respuestas de ejemplo para el feliz, el rechazo de A2 y el de A3.
 
-Enlace al commit de la solución: https://github.com/GioMonteggia/INICIALES-taller-git-2026/commit/c28b52d620660958569c744e585879817a3c2492
+Enlace al commit de la solución: https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026/commit/c28b52d620660958569c744e585879817a3c2492
 
 ## Modelo y persistencia
 
@@ -598,8 +598,12 @@ El proyecto incluye el archivo `LICENSE` con la licencia Apache 2.0.
 
 ## Commits de implementación
 
-POO-08 (observaciones cerradas): https://github.com/GioMonteggia/INICIALES-taller-git-2026/commit/920291e5c8bfe7bfc79db51389eb4c066e94fae8
+POO-08 (observaciones cerradas): https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026/commit/920291e5c8bfe7bfc79db51389eb4c066e94fae8
 
-POO-09 (solución completa: OpenAPI, clientes, escenario y documentación): https://github.com/GioMonteggia/INICIALES-taller-git-2026/commit/c28b52d620660958569c744e585879817a3c2492
+POO-09 (solución completa: OpenAPI, clientes, escenario y documentación): https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026/commit/c28b52d620660958569c744e585879817a3c2492
 
-Repositorio: https://github.com/GioMonteggia/INICIALES-taller-git-2026
+Repositorio: https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026
+
+## Revisión final de Luis Tauber (A3)
+
+Luis revisó la entrega y marcó dos detalles menores. La respuesta `409` del escenario devolvía `municiÃ³n`: Spring carga `application.properties` como ISO-8859-1, por eso los acentos se escribieron con escapes Unicode (`\u00e9`, `\u00ed`, `\u00f3`). La prueba HTTP real ahora devuelve `munición` sin mojibake. También señaló que los enlaces usaban el nombre anterior `INICIALES-taller-git-2026`; se reemplazaron por el nombre canónico `SMONTEGGIA-taller-git-2026` en toda la documentación. Las 26 pruebas automatizadas siguen pasando.

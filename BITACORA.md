@@ -276,17 +276,26 @@ Reverificación final con el commit `24921ac` de César (rama `poo09-apis-cruzad
 
 La auditoría final del cierre se realizó con OpenCode como herramienta adicional: se revisaron los tres enunciados y los enlaces publicados, se corrigieron los datos desactualizados de la documentación (nombre del repositorio en los enlaces, conteos de pruebas, mensaje de rechazo de A2, notas sobre el OpenAPI de César y guía de arranque), se comprobó la ortografía de los documentos Markdown, se ejecutaron las 26 pruebas automatizadas y se publicaron los cambios en `main`. El uso de OpenCode no sustituyó la revisión manual: cada enlace y cada dato se comprobó contra el repositorio, los repositorios de los compañeros y las respuestas HTTP reales.
 
+### 6.9. Revisión de Luis Tauber (A3)
+
+Luis revisó la entrega y señaló dos defectos menores, sin impacto en los criterios puntuados:
+
+- El campo `regla` de la respuesta `409` del escenario devolvía `municiÃ³n` en lugar de `munición`. La causa era la codificación con la que Spring carga `application.properties`: los valores con tildes se escribieron con escapes Unicode (`\u00e9`, `\u00ed`, `\u00f3`) en `companeros.a2.nombre` y `companeros.a3.regla`. La prueba HTTP real volvió a dar 409 con `rechazadoPor: "A3"` y la regla correcta, sin `Ã`; `/v3/api-docs` respondió 200 sin mojibake.
+- Los enlaces al repositorio usaban el nombre anterior `INICIALES-taller-git-2026`, que Luis tomó por un placeholder. Se comprobó que redirigían con HTTP 200 al repositorio real, pero se reemplazaron por el nombre canónico `SMONTEGGIA-taller-git-2026` en toda la documentación para evitar la confusión.
+
+Después de estos cambios se ejecutaron nuevamente las 26 pruebas automatizadas (`Failures: 0, Errors: 0`) y se mantuvieron los tres servicios levantados en 8080, 8081 y 8082.
+
 ## 7. Referencia al código publicado
 
 POO-08 (código y servicios):
 
-https://github.com/GioMonteggia/INICIALES-taller-git-2026/commit/5861daf
+https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026/commit/5861daf
 
 POO-08 (cierre de observaciones de la corrección):
 
-https://github.com/GioMonteggia/INICIALES-taller-git-2026/commit/920291e5c8bfe7bfc79db51389eb4c066e94fae8
+https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026/commit/920291e5c8bfe7bfc79db51389eb4c066e94fae8
 
-POO-09 se implementó en varios commits sobre la rama `poo-09-apis-cruzadas`: `d692ce7` (OpenAPI y reglas), `fed4984` (clientes hacia A2 y A3), `d2370df` (escenario persistido), `4c979a7` (entrega independiente), `5f91e60` (integración real de A3) y `7744e27` (integración real de A2 y round robin completo). El enlace de entrega definitiva se registra en `README.md` y apunta al commit publicado que incluye la versión final del código y de la documentación: https://github.com/GioMonteggia/INICIALES-taller-git-2026/commit/c28b52d620660958569c744e585879817a3c2492. Las correcciones finales de documentación de esta auditoría están en el tip de la rama y de `main`.
+POO-09 se implementó en varios commits sobre la rama `poo-09-apis-cruzadas`: `d692ce7` (OpenAPI y reglas), `fed4984` (clientes hacia A2 y A3), `d2370df` (escenario persistido), `4c979a7` (entrega independiente), `5f91e60` (integración real de A3) y `7744e27` (integración real de A2 y round robin completo). El enlace de entrega definitiva se registra en `README.md` y apunta al commit publicado que incluye la versión final del código y de la documentación: https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026/commit/c28b52d620660958569c744e585879817a3c2492. Las correcciones finales de documentación y de codificación UTF-8 de esta auditoría están en el tip de la rama y de `main`.
 
 ## 8. Resultado final
 

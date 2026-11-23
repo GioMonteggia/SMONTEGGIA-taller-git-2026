@@ -2,7 +2,7 @@
 
 Este documento aplica la [consigna de POO-09](https://github.com/alefq/afq-taller-git-2024/blob/main/docs/ejercicio-poo-09-apis-cruzadas-2026-11-16.md), la [guía de grupos](https://github.com/alefq/afq-taller-git-2024/blob/main/docs/ejercicio-poo-09-grupos-2026-11-16.md) y el [ejemplo UNO](https://github.com/alefq/afq-taller-git-2024/blob/main/docs/ejercicio-poo-09-ejemplo-uno-2026-11-16.md) a este repositorio. Los tres enlaces se verificaron con HTTP 200.
 
-**Enlace al commit de la solución:** https://github.com/GioMonteggia/INICIALES-taller-git-2026/commit/c28b52d620660958569c744e585879817a3c2492
+**Enlace al commit de la solución:** https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026/commit/c28b52d620660958569c744e585879817a3c2492
 
 ---
 
@@ -21,6 +21,8 @@ La corrección recibida registró 18 de 24 con observaciones. Todas quedaron cer
 | Documentación desactualizada | Se corrigió el enlace al commit final, la recarga parcial, el diagrama Mermaid y la ortografía. |
 
 La mejora optativa de otra familia para `AccionCombate` no se aplicó; el documento aclaraba que no descontaba puntos. La otra mejora optativa, el merge en `main`, sí se aplicó al cierre: `main` incluye ahora POO-08 y POO-09.
+
+En la revisión final de Luis Tauber (A3) se corrigió la codificación de `application.properties` con escapes Unicode, porque Spring carga los `.properties` como ISO-8859-1: la regla devuelta en el rechazo del escenario dice `munición` y no `municiÃ³n`. También se reemplazaron los enlaces con el nombre anterior del repositorio por el nombre canónico `SMONTEGGIA-taller-git-2026`. Estas correcciones finales están en el tip de la rama y de `main`.
 
 ---
 
@@ -73,7 +75,7 @@ Cada servicio se clona y se arranca desde su repositorio con `./mvnw spring-boot
 ```powershell
 # Una sola vez: clonar los tres repositorios
 git clone https://github.com/LTP22/ltauber-tp-lp3-2026.git a3-tauber
-git clone https://github.com/GioMonteggia/INICIALES-taller-git-2026.git a1-monteggia
+git clone https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026.git a1-monteggia
 git clone https://github.com/cesarraa/crr-taller-git-2026.git a2-ramirez
 cd a1-monteggia
 git checkout poo-09-apis-cruzadas
