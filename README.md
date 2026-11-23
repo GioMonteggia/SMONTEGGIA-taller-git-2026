@@ -50,19 +50,19 @@ El documento incluye el CRUD (`/api/armas`), la simulación (`/api/simulacion/**
 
 ### Mapa A1 / A2 / A3 y reglas citadas
 
-**Estado del grupo:** acuerdo por orden alfabético de apellido — A1 Giovanni Monteggia, A2 César Ramírez, A3 Luis Tauber. Puertos acordados: A3 8080, A1 8081, A2 8082. El challenge es individual y la nota es individual; el grupo sólo acuerda a quién se consulta. A3 (Luis Tauber) ya envió repo, OpenAPI y regla. Falta la información equivalente de A2 (César Ramírez); esa celda se completa en cuanto la comparta.
+**Estado del grupo:** acuerdo por orden alfabético de apellido — A1 Giovanni Monteggia, A2 César Ramírez, A3 Luis Tauber. Puertos acordados: A3 8080, A1 8081, A2 8082. El challenge es individual y la nota es individual; el grupo sólo acuerda a quién se consulta. A2 (César Ramírez) y A3 (Luis Tauber) enviaron repo, URL base y regla. El OpenAPI de A2 figura con la URL informada, aunque al verificar el `HEAD` publicado de su repo `/v3/api-docs` devolvió 404; ver `BITACORA.md`.
 
 | Rol | Estudiante / servicio | URL base | URL del OpenAPI | Regla que se consulta (en una frase) |
 |---|---|---|---|---|
 | A1 | Sergio Giovanni Monteggia Ortega (este repositorio) | `http://localhost:8081` | `http://localhost:8081/v3/api-docs` | Disparo: con munición, daño y precisión válidos, calcula el daño efectivo según la distancia. Recarga: si hay espacio y reserva, transfiere `min(espacio, reserva)`. |
-| A2 | César Ramírez — **PENDIENTE de repo y OpenAPI** | `http://localhost:8082` | **PENDIENTE** | Propuesta: validación de disparo. **PENDIENTE** de citar en una frase desde su OpenAPI. |
+| A2 | César Ramírez — https://github.com/cesarraa/crr-taller-git-2026 | `http://localhost:8082` | `http://localhost:8082/v3/api-docs` (informado; ver nota) | El precio del arma debe estar entre $0 y $16.000; validada en `POST /api/armas` (201 si cumple, 422 con `codigo: CS2_ECONOMIA_EXCEDIDA` si no). |
 | A3 | Luis Tauber — https://github.com/LTP22/ltauber-tp-lp3-2026 | `http://localhost:8080` | `http://localhost:8080/v3/api-docs` | Un arma de fuego necesita munición para disparar y una granada no se puede lanzar dos veces; validada en `POST /api/reglas/combate` con `{tieneBalas, granadaLanzada}`. |
 
-El escenario mapea A2 (César) a la validación de disparo (`companeros.a2.validar-path=/api/reglas/disparo`, pendiente de su confirmación) y A3 (Luis) a su regla real (`companeros.a3.validar-path=/api/reglas/combate`). El cliente lee los nombres de campo publicados por cada OpenAPI, sin importar clases del proyecto ajeno.
+El escenario mapea A2 (César) a `POST /api/armas` (`companeros.a2.validar-path=/api/armas`) y A3 (Luis) a `POST /api/reglas/combate`. A2 recibe un arma con el precio del rifle persistido en A1: si el precio supera $16.000 responde 422 y A1 atribuye el rechazo a A2. El cliente lee los campos publicados por cada API, sin importar clases del proyecto ajeno.
 
 ### Escenario en una frase
 
-Con un rifle y un jugador persistidos en A1, `POST /api/escenarios` simula **un disparo con lanzamiento de granada: A2 valida el disparo, A3 valida que haya balas y que la granada no se lance dos veces, y A1 guarda la jugada en su H2 sólo si los dos aceptan**; un `GET /api/escenarios` la vuelve a mostrar. El cuerpo admite `granadaLanzada` (opcional, por defecto `false`) para provocar el rechazo de A3.
+Con un rifle y un jugador persistidos en A1, `POST /api/escenarios` simula **un disparo con lanzamiento de granada: A2 valida la regla económica del arma, A3 valida que haya balas y que la granada no se lance dos veces, y A1 guarda la jugada en su H2 sólo si los dos aceptan**; un `GET /api/escenarios` la vuelve a mostrar. Para provocar el rechazo de A2 se usa un rifle con precio mayor a $16.000; para el de A3, el cuerpo admite `granadaLanzada: true`.
 
 ### Cliente y configuración
 
@@ -70,14 +70,14 @@ Con un rifle y un jugador persistidos en A1, `POST /api/escenarios` simula **un 
 
 | Propiedad | Variable de entorno | Valor por defecto (prueba local) |
 |---|---|---|
-| `companeros.a2.base-url` | `COMPANEROS_A2_BASE_URL` | `http://localhost:8081` |
-| `companeros.a2.validar-path` | `COMPANEROS_A2_VALIDAR_PATH` | `/api/reglas/disparo` |
-| `companeros.a2.openapi-url` | `COMPANEROS_A2_OPENAPI_URL` | `http://localhost:8081/v3/api-docs` |
+| `companeros.a2.base-url` | `COMPANEROS_A2_BASE_URL` | `http://localhost:8082` (César) |
+| `companeros.a2.validar-path` | `COMPANEROS_A2_VALIDAR_PATH` | `/api/armas` |
+| `companeros.a2.openapi-url` | `COMPANEROS_A2_OPENAPI_URL` | `http://localhost:8082/v3/api-docs` (informado) |
 | `companeros.a3.base-url` | `COMPANEROS_A3_BASE_URL` | `http://localhost:8080` (Luis) |
 | `companeros.a3.validar-path` | `COMPANEROS_A3_VALIDAR_PATH` | `/api/reglas/combate` |
 | `companeros.a3.openapi-url` | `COMPANEROS_A3_OPENAPI_URL` | `http://localhost:8080/v3/api-docs` |
 
-A3 ya apunta a su servicio real en el puerto 8080. A2 sigue apuntando a este mismo servicio (`8081`) para poder verificar el escenario de forma local; se reemplaza por la URL de César cuando la comparta. Todo se puede sobreescribir con las variables de entorno.
+Los dos clientes apuntan a los servicios reales: A2 a `8082` y A3 a `8080`. Todo se puede sobreescribir con las variables de entorno.
 
 ### Errores y atribución
 
@@ -88,7 +88,7 @@ A3 ya apunta a su servicio real en el puerto 8080. A2 sigue apuntando a este mis
 | A3 rechaza | HTTP 409 con `rechazadoPor: "A3"` | Sin cambios |
 | Algún compañero no responde | HTTP 502 con `rechazadoPor` y `motivo: "sin respuesta"` | Sin cambios |
 
-El orden es A2 y después A3 porque sin un disparo válido no tiene sentido validar el lanzamiento de la granada. El `save` ocurre recién después de las dos respuestas favorables. A3 responde HTTP 200 tanto en la aceptación como en el rechazo; el cliente distingue por el campo `aceptada`.
+El orden es A2 y después A3 porque si el arma no pasa la regla económica no tiene sentido validar el lanzamiento de la granada. El `save` ocurre recién después de las dos respuestas favorables. A3 responde HTTP 200 tanto en la aceptación como en el rechazo y el cliente distingue por `aceptada`; A2 responde 201/422 y el cliente lee el motivo de `error`.
 
 ### Cómo arrancar los tres servicios
 
@@ -105,7 +105,7 @@ $env:COMPANEROS_A3_BASE_URL="http://localhost:8080"
 .\mvnw.cmd spring-boot:run
 
 # Terminal 3 — A2 (César Ramírez): puerto 8082
-cd <repo de César Ramírez>
+cd <clon de https://github.com/cesarraa/crr-taller-git-2026>
 $env:SERVER_PORT=8082
 .\mvnw.cmd spring-boot:run
 ```

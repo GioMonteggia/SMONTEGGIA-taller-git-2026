@@ -51,7 +51,8 @@ class EscenarioServiceTests {
     @BeforeEach
     void preparar() {
         servicio = new EscenarioService(
-                armaRepository, jugadorRepository, jugadaRepository, a2, a3);
+                armaRepository, jugadorRepository, jugadaRepository, a2, a3,
+                new ReglasCombateService());
 
         Rifle rifle = new Rifle("AK-47", 2700f, 36, 30);
         rifle.disparar();
@@ -77,6 +78,28 @@ class EscenarioServiceTests {
         assertEquals(15, jugada.getDanoEfectivo());
         assertEquals(1, jugada.getMunicionTransferida());
         verify(jugadaRepository).save(any(Jugada.class));
+    }
+
+    @Test
+    void a2RecibeUnBodyCompatibleConSuCreacionDeArma() {
+        when(a2.validar(anyMap())).thenReturn(
+                new ResultadoValidacion(true, "A2 ok", null, null, 201));
+        when(a3.validar(anyMap())).thenReturn(
+                new ResultadoValidacion(true, "A3 ok", null, null, 200));
+        when(jugadaRepository.save(any(Jugada.class)))
+                .thenAnswer(invocacion -> invocacion.getArgument(0));
+
+        servicio.ejecutar(new SolicitudEscenario(1L, 2L, 35, false));
+
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<Map<String, Object>> captor =
+                ArgumentCaptor.forClass(Map.class);
+        verify(a2).validar(captor.capture());
+        Map<String, Object> enviado = captor.getValue();
+        assertEquals("FRANCOTIRADOR", enviado.get("tipo"));
+        assertEquals(2700f, enviado.get("precio"));
+        assertEquals(36, enviado.get("dano"));
+        assertEquals(2, enviado.get("zoom"));
     }
 
     @Test

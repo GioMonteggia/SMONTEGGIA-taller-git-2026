@@ -26,9 +26,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/escenarios")
 @Tag(
         name = "Escenario POO-09",
-        description = "Disparo con lanzamiento de granada validado por A2 y "
-                + "por A3. La jugada se guarda en H2 sólo si los dos "
-                + "compañeros aceptan.")
+        description = "Disparo con lanzamiento de granada. A2 valida la regla "
+                + "económica del arma y A3 valida munición y granada no "
+                + "reutilizada. La jugada se guarda en H2 sólo si los dos "
+                + "aceptan.")
 public class EscenarioController {
 
     private final EscenarioService escenarioService;
@@ -39,8 +40,8 @@ public class EscenarioController {
 
     @Operation(
             summary = "Ejecutar el escenario con las dos APIs ajenas",
-            description = "A2 valida el disparo y A3 valida munición y "
-                    + "granada no reutilizada. El cliente sólo habla con A1.")
+            description = "A2 valida el precio del arma y A3 valida munición "
+                    + "y granada no reutilizada. El cliente sólo habla con A1.")
     @ApiResponses({
         @ApiResponse(responseCode = "201",
                 description = "A2 y A3 aceptaron; jugada persistida.",
@@ -54,10 +55,10 @@ public class EscenarioController {
                 content = @Content(
                         mediaType = "application/json",
                         examples = @ExampleObject(
-                                name = "Rechazo de A3",
+                                name = "Rechazo de A2",
                                 value = """
                                         {
-                                          "error": "A3 rechazó el escenario: La granada ya fue lanzada.",
+                                          "error": "A2 rechazó el escenario: El precio $25000.0 supera el tope de $16,000 en la economía de CS2.",
                                           "rechazadoPor": "A3",
                                           "codigoHttpCompanero": 200
                                         }

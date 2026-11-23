@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import com.gio.cs2api.domain.Arma;
 import com.gio.cs2api.domain.ArmaNoEncontradaException;
@@ -20,9 +21,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Escenario propio: disparo con lanzamiento de granada. A2 valida el disparo y
- * A3 (Luis) valida que haya balas y que la granada no se lance dos veces.
- * Sólo se escribe en H2 cuando los dos aceptan.
+ * Escenario propio: disparo con lanzamiento de granada. A2 (César) valida la
+ * regla económica del arma y A3 (Luis) valida que haya balas y que la granada
+ * no se lance dos veces. Sólo se escribe en H2 cuando los dos aceptan.
  */
 @Service
 public class EscenarioService {
@@ -32,19 +33,22 @@ public class EscenarioService {
     private final JugadaRepository jugadaRepository;
     private final ValidadorCompanero a2;
     private final ValidadorCompanero a3;
+    private final ReglasCombateService reglas;
 
     public EscenarioService(
             ArmaRepository armaRepository,
             JugadorRepository jugadorRepository,
             JugadaRepository jugadaRepository,
             @Qualifier("A2") ValidadorCompanero a2,
-            @Qualifier("A3") ValidadorCompanero a3) {
+            @Qualifier("A3") ValidadorCompanero a3,
+            ReglasCombateService reglas) {
 
         this.armaRepository = armaRepository;
         this.jugadorRepository = jugadorRepository;
         this.jugadaRepository = jugadaRepository;
         this.a2 = a2;
         this.a3 = a3;
+        this.reglas = reglas;
     }
 
     @Transactional
@@ -78,11 +82,20 @@ public class EscenarioService {
                 .orElseThrow(() -> new IllegalArgumentException(
                         "No existe un jugador con ID " + solicitud.jugadorId()));
 
-        Map<String, Object> datosDisparo = new LinkedHashMap<>();
-        datosDisparo.put("municionActual", rifle.getMunicionActual());
-        datosDisparo.put("danoBase", rifle.getDano());
-        datosDisparo.put("precision", rifle.getPrecision());
-        datosDisparo.put("distancia", distancia);
+        // A2 publica POST /api/armas con deserialización polimórfica: el
+        // discriminador "tipo" y los campos del arma se toman del rifle
+        // persistido en A1. El nombre se hace único porque A2 rechaza nombres
+        // repetidos. Un precio mayor a 16000 provoca su rechazo económico.
+        Map<String, Object> datosEconomia = new LinkedHashMap<>();
+        datosEconomia.put("tipo", "FRANCOTIRADOR");
+        datosEconomia.put("nombre", rifle.getNombre() + " - A1 "
+                + UUID.randomUUID());
+        datosEconomia.put("precio", rifle.getPrecio());
+        datosEconomia.put("dano", rifle.getDano());
+        datosEconomia.put("peso", rifle.getPeso());
+        datosEconomia.put("municionMax", rifle.getMunicionMax());
+        datosEconomia.put("municionActual", rifle.getMunicionActual());
+        datosEconomia.put("zoom", 2);
 
         // A3 publica /api/reglas/combate con estos dos nombres de campo.
         // "tieneBalas" sale del rifle persistido y "granadaLanzada" se puede
@@ -92,9 +105,9 @@ public class EscenarioService {
         datosCombate.put("granadaLanzada",
                 Boolean.TRUE.equals(solicitud.granadaLanzada()));
 
-        // A2 va primero: sin un disparo válido no tiene sentido pedir el
-        // lanzamiento de la granada.
-        ResultadoValidacion respuestaA2 = a2.validar(datosDisparo);
+        // A2 va primero: si el arma no pasa la regla económica, no tiene
+        // sentido pedir el lanzamiento de la granada.
+        ResultadoValidacion respuestaA2 = a2.validar(datosEconomia);
         if (!respuestaA2.aceptada()) {
             throw new RechazoCompaneroException(
                     a2.rol(), a2.regla(), respuestaA2);
@@ -106,6 +119,16 @@ public class EscenarioService {
                     a3.rol(), a3.regla(), respuestaA3);
         }
 
+        // A2 no calcula daño: su regla es económica. Si el compañero no
+        // devuelve un daño, se usa la regla de disparo propia de A1.
+        Integer danoA2 = respuestaA2.danoEfectivo();
+        int danoEfectivo = danoA2 != null ? danoA2 : valorPorDefecto(
+                reglas.validarDisparo(
+                        rifle.getMunicionActual(),
+                        rifle.getDano(),
+                        rifle.getPrecision(),
+                        distancia).danoEfectivo());
+
         // Recién aquí se escribe en la base: un rechazo no deja rastro.
         Jugada jugada = new Jugada(
                 rifle.getNombre() + " dispara a " + distancia
@@ -114,7 +137,7 @@ public class EscenarioService {
                 rifle.getId(),
                 jugador.getId(),
                 distancia,
-                valorPorDefecto(respuestaA2.danoEfectivo()),
+                danoEfectivo,
                 valorPorDefecto(respuestaA3.municionTransferida()),
                 true,
                 true,

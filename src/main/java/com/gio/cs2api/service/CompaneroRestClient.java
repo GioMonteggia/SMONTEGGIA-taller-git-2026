@@ -127,9 +127,16 @@ public class CompaneroRestClient implements ValidadorCompanero {
                     && (explicita == null || explicita);
 
             String mensaje = leerTexto(nodo,
-                    "mensaje", "message", "detalle", "reason", "error");
+                    "mensaje", "message", "detalle", "reason", "error",
+                    "nombre");
             if (mensaje == null || mensaje.isBlank()) {
                 mensaje = cuerpo == null ? "" : cuerpo;
+            }
+            // La columna mensaje_compañero de H2 admite 255 caracteres. Algunos
+            // compañeros no devuelven un campo "mensaje" y el cuerpo completo
+            // puede ser más largo; se recorta para que la jugada se persista.
+            if (mensaje.length() > 250) {
+                mensaje = mensaje.substring(0, 250);
             }
 
             return new ResultadoValidacion(

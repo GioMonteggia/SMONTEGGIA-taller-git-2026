@@ -11,7 +11,7 @@
       "name": "POO-09 - APIs cruzadas CS2 (A1)",
       "created": 1795400000001,
       "modified": 1795400000001,
-      "description": "Escenario propio de A1: dispara y recarga sólo si A2 y A3 aceptan."
+      "description": "Escenario de A1: disparo con lanzamiento de granada. A2 valida la regla económica del arma y A3 valida munición y granada no reutilizada."
     },
     {
       "_id": "env_poo09",
@@ -27,8 +27,7 @@
         "a3_base_url": "http://localhost:8080",
         "rifleId": "REEMPLAZAR_CON_ID",
         "jugadorId": "REEMPLAZAR_CON_ID",
-        "rifleVacioId": "REEMPLAZAR_CON_ID",
-        "rifleLlenoId": "REEMPLAZAR_CON_ID"
+        "rifleCaroId": "REEMPLAZAR_CON_ID"
       },
       "metaSortKey": 1
     },
@@ -106,7 +105,7 @@
       "modified": 1795400000008,
       "method": "GET",
       "url": "{{ a2_base_url }}/v3/api-docs",
-      "description": "Primer contacto con A2: leer su documento, no su código.",
+      "description": "OpenAPI informada por César Ramírez (A2) en el puerto 8082. Nota: al verificar el HEAD publicado de su repo, /v3/api-docs devolvió 404; ver BITACORA.md.",
       "headers": [],
       "body": {},
       "authentication": {},
@@ -206,7 +205,7 @@
       "modified": 1795400000012,
       "method": "POST",
       "url": "{{ a1_base_url }}/api/simulacion/disparar?rifleId={{ rifleId }}&jugadorId={{ jugadorId }}&distancia=50",
-      "description": "Necesario para que A3 acepte la recarga: el cargador no debe estar lleno.",
+      "description": "Deja 29/30. A3 exige que quede al menos una bala.",
       "headers": [],
       "body": {},
       "authentication": {},
@@ -222,12 +221,12 @@
       "_id": "req_crear_vacio",
       "_type": "request",
       "parentId": "fld_preparar",
-      "name": "Crear rifle vacío (1 bala)",
+      "name": "Crear rifle caro (precio 25000)",
       "created": 1795400000013,
       "modified": 1795400000013,
       "method": "POST",
       "url": "{{ a1_base_url }}/api/armas",
-      "description": "Guardar el id en rifleVacioId.",
+      "description": "Guardar el id en rifleCaroId. Provoca el rechazo de A2.",
       "headers": [
         {
           "name": "Content-Type",
@@ -236,7 +235,7 @@
       ],
       "body": {
         "mimeType": "application/json",
-        "text": "{\n  \"tipo\": \"rifle\",\n  \"nombre\": \"AK-47 SIN MUNICION\",\n  \"precio\": 2700,\n  \"dano\": 36,\n  \"cargador\": 1\n}"
+        "text": "{\n  \"tipo\": \"rifle\",\n  \"nombre\": \"AWP CARA A2\",\n  \"precio\": 25000,\n  \"dano\": 36,\n  \"cargador\": 30\n}"
       },
       "authentication": {},
       "metaSortKey": -170,
@@ -251,45 +250,16 @@
       "_id": "req_vaciar",
       "_type": "request",
       "parentId": "fld_preparar",
-      "name": "Agotar rifle vacío",
+      "name": "Ver rifle caro creado (GET)",
       "created": 1795400000014,
       "modified": 1795400000014,
-      "method": "POST",
-      "url": "{{ a1_base_url }}/api/simulacion/disparar?rifleId={{ rifleVacioId }}&jugadorId={{ jugadorId }}&distancia=50",
-      "description": "Deja 0/1 para provocar el rechazo de A2.",
+      "method": "GET",
+      "url": "{{ a1_base_url }}/api/armas/{{ rifleCaroId }}",
+      "description": "Opcional: comprobar que el precio 25000 quedó persistido.",
       "headers": [],
       "body": {},
       "authentication": {},
       "metaSortKey": -160,
-      "settingStoreCookies": true,
-      "settingSendCookies": true,
-      "settingEncodeUrl": true,
-      "settingDisableRenderRequestBody": false,
-      "settingFollowRedirects": "global",
-      "settingRebuildPath": true
-    },
-    {
-      "_id": "req_crear_lleno",
-      "_type": "request",
-      "parentId": "fld_preparar",
-      "name": "Crear rifle lleno (30/30)",
-      "created": 1795400000015,
-      "modified": 1795400000015,
-      "method": "POST",
-      "url": "{{ a1_base_url }}/api/armas",
-      "description": "Guardar el id en rifleLlenoId para provocar el rechazo de A3.",
-      "headers": [
-        {
-          "name": "Content-Type",
-          "value": "application/json"
-        }
-      ],
-      "body": {
-        "mimeType": "application/json",
-        "text": "{\n  \"tipo\": \"rifle\",\n  \"nombre\": \"AK-47 LLENO\",\n  \"precio\": 2700,\n  \"dano\": 36,\n  \"cargador\": 30\n}"
-      },
-      "authentication": {},
-      "metaSortKey": -150,
       "settingStoreCookies": true,
       "settingSendCookies": true,
       "settingEncodeUrl": true,
@@ -306,7 +276,7 @@
       "modified": 1795400000016,
       "method": "POST",
       "url": "{{ a1_base_url }}/api/escenarios",
-      "description": "Sólo se llama a A1. A2 valida el disparo y A3 valida munición y granada no reutilizada. Devuelve 201.",
+      "description": "Sólo se llama a A1. A2 valida el precio del arma y A3 valida munición y granada no reutilizada. Devuelve 201.",
       "headers": [
         {
           "name": "Content-Type",
@@ -351,12 +321,12 @@
       "_id": "req_rechazo_a2",
       "_type": "request",
       "parentId": "fld_rechazos",
-      "name": "Rechazo de A2 (sin munición)",
+      "name": "Rechazo de A2 (precio 25000)",
       "created": 1795400000018,
       "modified": 1795400000018,
       "method": "POST",
       "url": "{{ a1_base_url }}/api/escenarios",
-      "description": "A2 rechaza primero; A3 no llega a consultarse. HTTP 409.",
+      "description": "A2 rechaza primero con 422 (`CS2_ECONOMIA_EXCEDIDA`); A3 no llega a consultarse. A1 devuelve 409.",
       "headers": [
         {
           "name": "Content-Type",
@@ -365,7 +335,7 @@
       ],
       "body": {
         "mimeType": "application/json",
-        "text": "{\n  \"rifleId\": \"{{ rifleVacioId }}\",\n  \"jugadorId\": \"{{ jugadorId }}\",\n  \"distancia\": 50\n}"
+        "text": "{\n  \"rifleId\": \"{{ rifleCaroId }}\",\n  \"jugadorId\": \"{{ jugadorId }}\",\n  \"distancia\": 50,\n  \"granadaLanzada\": false\n}"
       },
       "authentication": {},
       "metaSortKey": -400,
@@ -413,7 +383,7 @@
       "created": 1795400000020,
       "modified": 1795400000020,
       "statusCode": 201,
-      "body": "{\n  \"descripcion\": \"AK-47 ESCENARIO dispara a 50 m y recarga con la reserva de Jugador escenario\",\n  \"rifleId\": 76,\n  \"jugadorId\": 68,\n  \"distancia\": 50,\n  \"danoEfectivo\": 15,\n  \"municionTransferida\": 1,\n  \"aceptadaPorA2\": true,\n  \"aceptadaPorA3\": true,\n  \"mensajeA2\": \"La regla acepta el disparo.\",\n  \"mensajeA3\": \"La regla acepta la recarga.\"\n}",
+      "body": "{\n  \"descripcion\": \"AK-47 ESCENARIO dispara a 50 m y valida el lanzamiento de granada con Jugador escenario\",\n  \"rifleId\": 108,\n  \"jugadorId\": 100,\n  \"distancia\": 50,\n  \"danoEfectivo\": 15,\n  \"municionTransferida\": 0,\n  \"aceptadaPorA2\": true,\n  \"aceptadaPorA3\": true,\n  \"mensajeA2\": \"AK-47 ESCENARIO - A1 <uuid-generado>\",\n  \"mensajeA3\": \"La regla acepta el disparo y el lanzamiento.\",\n  \"registradaEn\": \"2026-11-23T04:10:00\"\n}",
       "contentType": "application/json",
       "headers": [],
       "elapsed": 12
@@ -426,7 +396,7 @@
       "created": 1795400000021,
       "modified": 1795400000021,
       "statusCode": 409,
-      "body": "{\n  \"error\": \"A2 rechazó el escenario: El rifle no tiene munición.\",\n  \"rechazadoPor\": \"A2\",\n  \"regla\": \"Validacion de disparo: danio efectivo segun distancia y precision\",\n  \"mensajeCompanero\": \"El rifle no tiene munición.\",\n  \"codigoHttpCompanero\": 400\n}",
+      "body": "{\n  \"error\": \"A2 rechazó el escenario: El precio $25000.0 supera el tope de $16,000 en la economía de CS2.\",\n  \"rechazadoPor\": \"A2\",\n  \"regla\": \"El precio del arma debe estar entre $0 y $16.000.\",\n  \"mensajeCompanero\": \"El precio $25000.0 supera el tope de $16,000 en la economía de CS2.\",\n  \"codigoHttpCompanero\": 422\n}",
       "contentType": "application/json",
       "headers": [],
       "elapsed": 12

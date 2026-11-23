@@ -94,6 +94,49 @@ class CompaneroRestClientTests {
     }
 
     @Test
+    void unMensajeLargoSeRecortaParaCaberEnLaColumnaDeH2() {
+        String mensajeLargo = "x".repeat(400);
+        servidor.expect(requestTo("http://companero.test/api/reglas/disparo"))
+                .andRespond(withSuccess(
+                        "{\"aceptada\":true,\"mensaje\":\"" + mensajeLargo + "\"}",
+                        MediaType.APPLICATION_JSON));
+
+        var resultado = cliente.validar(datosDisparo());
+
+        assertTrue(resultado.aceptada());
+        assertTrue(resultado.mensaje().length() <= 250);
+        servidor.verify();
+    }
+
+    @Test
+    void unRechazoEconomicoCon422YCampoErrorSeAtribuyeAlCompanero() {
+        RestClient.Builder constructor = RestClient.builder();
+        MockRestServiceServer servidorA2 =
+                MockRestServiceServer.bindTo(constructor).build();
+        CompaneroRestClient clienteA2 = new CompaneroRestClient(
+                "A2",
+                "precio entre 0 y 16000",
+                "http://companero.test",
+                "/api/armas",
+                new ObjectMapper(),
+                constructor);
+
+        servidorA2.expect(requestTo("http://companero.test/api/armas"))
+                .andRespond(withStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body("{\"status\":422,\"error\":\"Regla Económica CS2 Violada\","
+                                + "\"codigo\":\"CS2_ECONOMIA_EXCEDIDA\","
+                                + "\"precioSolicitado\":25000.0,\"limiteMaximo\":16000.0}"));
+
+        var resultado = clienteA2.validar(Map.of("precio", 25000f));
+
+        assertFalse(resultado.aceptada());
+        assertEquals("Regla Económica CS2 Violada", resultado.mensaje());
+        assertEquals(422, resultado.codigoHttp());
+        servidorA2.verify();
+    }
+
+    @Test
     void unRechazoConHttp200YCampoAceptadaFalseSeInterpretaComoRechazo() {
         RestClient.Builder constructor = RestClient.builder();
         MockRestServiceServer servidorRechazo =
