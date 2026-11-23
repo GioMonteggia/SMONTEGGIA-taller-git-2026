@@ -1,8 +1,11 @@
 package com.gio.cs2api.service;
 
 import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.JsonNode;
@@ -17,14 +20,17 @@ import org.springframework.web.client.RestClientException;
 
 /**
  * Cliente HTTP genérico para un compañero. Sólo conoce la URL que publica el
- * OpenAPI ajeno; interpreta el resultado por los nombres de campo del documento
- * y no importa clases ni reglas del proyecto del compañero.
+ * OpenAPI ajeno. Interpreta el resultado por los nombres de campo del documento
+ * y, cuando el compañero no publica un campo booleano, infiere la aceptación
+ * del código HTTP (2xx = aceptado). No importa clases ni reglas del proyecto
+ * del compañero.
  */
 public class CompaneroRestClient implements ValidadorCompanero {
 
     private final String rol;
     private final String regla;
     private final String urlValidacion;
+    private final boolean usarQuery;
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
 
@@ -36,8 +42,20 @@ public class CompaneroRestClient implements ValidadorCompanero {
             int timeoutMs,
             ObjectMapper objectMapper) {
 
+        this(rol, regla, baseUrl, validarPath, timeoutMs, objectMapper, false);
+    }
+
+    public CompaneroRestClient(
+            String rol,
+            String regla,
+            String baseUrl,
+            String validarPath,
+            int timeoutMs,
+            ObjectMapper objectMapper,
+            boolean usarQuery) {
+
         this(rol, regla, baseUrl, validarPath, objectMapper,
-                constructorConTimeout(timeoutMs));
+                constructorConTimeout(timeoutMs), usarQuery);
     }
 
     private static RestClient.Builder constructorConTimeout(int timeoutMs) {
@@ -57,9 +75,22 @@ public class CompaneroRestClient implements ValidadorCompanero {
             ObjectMapper objectMapper,
             RestClient.Builder constructor) {
 
+        this(rol, regla, baseUrl, validarPath, objectMapper, constructor, false);
+    }
+
+    CompaneroRestClient(
+            String rol,
+            String regla,
+            String baseUrl,
+            String validarPath,
+            ObjectMapper objectMapper,
+            RestClient.Builder constructor,
+            boolean usarQuery) {
+
         this.rol = rol;
         this.regla = regla;
         this.urlValidacion = unirUrls(baseUrl, validarPath);
+        this.usarQuery = usarQuery;
 
         this.restClient = constructor
                 .defaultHeader(
@@ -81,23 +112,19 @@ public class CompaneroRestClient implements ValidadorCompanero {
     @Override
     public ResultadoValidacion validar(Map<String, Object> datos) {
         try {
-            ResponseEntity<String> respuesta = restClient.post()
-                    .uri(URI.create(urlValidacion))
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(datos)
-                    .retrieve()
-                    .onStatus(status -> true, (peticion, respuestaHttp) -> { })
-                    .toEntity(String.class);
+            ResponseEntity<String> respuesta = enviar(datos);
 
             String cuerpo = respuesta.getBody();
             JsonNode nodo = cuerpo == null || cuerpo.isBlank()
                     ? objectMapper.createObjectNode()
                     : objectMapper.readTree(cuerpo);
 
+            Boolean explicita = leerBooleanoOpcional(nodo,
+                    "aceptada", "aceptado", "aprobada",
+                    "valida", "valido", "ok");
+
             boolean aceptada = respuesta.getStatusCode().is2xxSuccessful()
-                    && leerBooleano(nodo,
-                            "aceptada", "aceptado", "aprobada",
-                            "valida", "valido", "ok");
+                    && (explicita == null || explicita);
 
             String mensaje = leerTexto(nodo,
                     "mensaje", "message", "detalle", "reason", "error");
@@ -108,8 +135,12 @@ public class CompaneroRestClient implements ValidadorCompanero {
             return new ResultadoValidacion(
                     aceptada,
                     mensaje,
-                    leerEntero(nodo, "danoEfectivo", "dañoEfectivo"),
-                    leerEntero(nodo, "municionTransferida", "municionATransferir"),
+                    leerEntero(nodo,
+                            "danoEfectivo", "dañoEfectivo",
+                            "danioInfligido", "danoRecibido"),
+                    leerEntero(nodo,
+                            "municionTransferida", "municionATransferir",
+                            "balasRestantes", "municionRestante"),
                     respuesta.getStatusCode().value());
 
         } catch (RestClientException exception) {
@@ -121,6 +152,40 @@ public class CompaneroRestClient implements ValidadorCompanero {
         }
     }
 
+    private ResponseEntity<String> enviar(Map<String, Object> datos) {
+        if (usarQuery) {
+            return restClient.post()
+                    .uri(URI.create(urlValidacion + construirQuery(datos)))
+                    .retrieve()
+                    .onStatus(status -> true, (peticion, respuesta) -> { })
+                    .toEntity(String.class);
+        }
+
+        return restClient.post()
+                .uri(URI.create(urlValidacion))
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(datos)
+                .retrieve()
+                .onStatus(status -> true, (peticion, respuesta) -> { })
+                .toEntity(String.class);
+    }
+
+    private static String construirQuery(Map<String, Object> datos) {
+        if (datos == null || datos.isEmpty()) {
+            return "";
+        }
+
+        return "?" + datos.entrySet().stream()
+                .filter(entrada -> entrada.getValue() != null)
+                .map(entrada -> codificar(entrada.getKey())
+                        + "=" + codificar(String.valueOf(entrada.getValue())))
+                .collect(Collectors.joining("&"));
+    }
+
+    private static String codificar(String valor) {
+        return URLEncoder.encode(valor, StandardCharsets.UTF_8);
+    }
+
     private static String unirUrls(String baseUrl, String validarPath) {
         String base = baseUrl == null ? "" : baseUrl.trim().replaceAll("/+$", "");
         String ruta = validarPath == null ? "" : validarPath.trim();
@@ -130,17 +195,17 @@ public class CompaneroRestClient implements ValidadorCompanero {
         return base + ruta;
     }
 
-    private static boolean leerBooleano(JsonNode nodo, String... nombres) {
+    private static Boolean leerBooleanoOpcional(JsonNode nodo, String... nombres) {
         for (String nombre : nombres) {
             JsonNode valor = nodo.get(nombre);
             if (valor != null && valor.isBoolean()) {
                 return valor.booleanValue();
             }
             if (valor != null && valor.isTextual()) {
-                return Boolean.parseBoolean(valor.asText());
+                return Boolean.parseBoolean(valor.asText().trim());
             }
         }
-        return false;
+        return null;
     }
 
     private static String leerTexto(JsonNode nodo, String... nombres) {

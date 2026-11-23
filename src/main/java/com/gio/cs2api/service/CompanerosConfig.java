@@ -34,12 +34,15 @@ public class CompanerosConfig {
                 ? propiedad.timeoutMs()
                 : 3000;
 
+        boolean usarQuery = "query".equalsIgnoreCase(propiedad.envio());
+
         return new CompaneroRestClient(
                 propiedad.rol(),
                 propiedad.regla(),
                 propiedad.baseUrl(),
                 propiedad.validarPath(),
                 timeout,
-                objectMapper);
+                objectMapper,
+                usarQuery);
     }
 }

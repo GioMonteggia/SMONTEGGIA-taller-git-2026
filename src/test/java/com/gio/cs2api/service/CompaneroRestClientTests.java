@@ -8,6 +8,7 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withBadRequest;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 import java.util.LinkedHashMap;
@@ -18,6 +19,7 @@ import tools.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
@@ -89,6 +91,75 @@ class CompaneroRestClientTests {
 
         assertEquals("A2", ex.getRol());
         servidor.verify();
+    }
+
+    @Test
+    void enModoQueryInfirmaLaAceptacionDelCodigoHttpSinCampoBooleano() {
+        RestClient.Builder constructor = RestClient.builder();
+        MockRestServiceServer servidorQuery =
+                MockRestServiceServer.bindTo(constructor).build();
+        CompaneroRestClient clienteQuery = new CompaneroRestClient(
+                "A3",
+                "regla de combate",
+                "http://companero.test",
+                "/simulaciones/combate",
+                new ObjectMapper(),
+                constructor,
+                true);
+
+        servidorQuery
+                .expect(requestTo("http://companero.test/simulaciones/combate"
+                        + "?armaDeFuegoId=7&granadaId=9"))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess(
+                        "{\"danioInfligido\":19,\"balasRestantes\":11,"
+                        + "\"granadaLanzada\":true}",
+                        MediaType.APPLICATION_JSON));
+
+        Map<String, Object> datos = new LinkedHashMap<>();
+        datos.put("armaDeFuegoId", 7);
+        datos.put("granadaId", 9);
+
+        var resultado = clienteQuery.validar(datos);
+
+        assertTrue(resultado.aceptada());
+        assertEquals(19, resultado.danoEfectivo());
+        assertEquals(11, resultado.municionTransferida());
+        assertEquals(200, resultado.codigoHttp());
+        servidorQuery.verify();
+    }
+
+    @Test
+    void enModoQueryUn409ConErrorSeAtribuyeAlCompanero() {
+        RestClient.Builder constructor = RestClient.builder();
+        MockRestServiceServer servidorQuery =
+                MockRestServiceServer.bindTo(constructor).build();
+        CompaneroRestClient clienteQuery = new CompaneroRestClient(
+                "A3",
+                "regla de combate",
+                "http://companero.test",
+                "/simulaciones/combate",
+                new ObjectMapper(),
+                constructor,
+                true);
+
+        servidorQuery.expect(requestTo(
+                "http://companero.test/simulaciones/combate"
+                        + "?armaDeFuegoId=7&granadaId=9"))
+                .andRespond(withStatus(HttpStatus.CONFLICT)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body("{\"error\":\"La granada con id 9 ya fue lanzada\"}"));
+
+        Map<String, Object> datos = new LinkedHashMap<>();
+        datos.put("armaDeFuegoId", 7);
+        datos.put("granadaId", 9);
+
+        var resultado = clienteQuery.validar(datos);
+
+        assertFalse(resultado.aceptada());
+        assertEquals("La granada con id 9 ya fue lanzada", resultado.mensaje());
+        assertEquals(409, resultado.codigoHttp());
+        servidorQuery.verify();
     }
 
     private static Map<String, Object> datosDisparo() {

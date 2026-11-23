@@ -17,6 +17,7 @@ public record CompanerosProperties(Companero a2, Companero a3) {
             String baseUrl,
             String openapiUrl,
             String validarPath,
+            String envio,
             int timeoutMs) {
     }
 }
