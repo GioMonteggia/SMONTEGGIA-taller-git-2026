@@ -22,8 +22,6 @@ La corrección recibida registró 18 de 24 con observaciones. Todas quedaron cer
 
 La mejora optativa de otra familia para `AccionCombate` no se aplicó; el documento aclaraba que no descontaba puntos. La otra mejora optativa, el merge en `main`, sí se aplicó al cierre: `main` incluye ahora POO-08 y POO-09.
 
-En la revisión final de Luis Tauber (A3) se corrigió la codificación de `application.properties` con escapes Unicode, porque Spring carga los `.properties` como ISO-8859-1: la regla devuelta en el rechazo del escenario dice `munición` y no `municiÃ³n`. También se reemplazaron los enlaces con el nombre anterior del repositorio por el nombre canónico `SMONTEGGIA-taller-git-2026`. Estas correcciones finales están en el tip de la rama y de `main`.
-
 ---
 
 ## 2. Mapa A1 / A2 / A3

@@ -604,6 +604,3 @@ POO-09 (solución completa: OpenAPI, clientes, escenario y documentación): http
 
 Repositorio: https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026
 
-## Revisión final de Luis Tauber (A3)
-
-Luis revisó la entrega y marcó dos detalles menores. La respuesta `409` del escenario devolvía `municiÃ³n`: Spring carga `application.properties` como ISO-8859-1, por eso los acentos se escribieron con escapes Unicode (`\u00e9`, `\u00ed`, `\u00f3`). La prueba HTTP real ahora devuelve `munición` sin mojibake. También señaló que los enlaces usaban el nombre anterior `INICIALES-taller-git-2026`; se reemplazaron por el nombre canónico `SMONTEGGIA-taller-git-2026` en toda la documentación. Las 26 pruebas automatizadas siguen pasando.
