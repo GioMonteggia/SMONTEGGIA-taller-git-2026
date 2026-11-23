@@ -110,6 +110,7 @@ La colección incluye respuestas de ejemplo exportadas para el feliz y para cada
 - Rechazo real de A2 con un rifle de precio 25000: HTTP 409, `rechazadoPor: "A2"`, `codigoHttpCompanero: 422` y mensaje «El precio $25000.0 supera el tope de $16,000 en la economía de CS2.».
 - Rechazo real de A3 con `granadaLanzada: true`: HTTP 409, `rechazadoPor: "A3"`, `codigoHttpCompanero: 200` y mensaje «La granada ya fue lanzada.».
 - Conteo de jugadas en la verificación final: `2 → 3 → 3 → 3` (ningún rechazo dejó rastro). La jugada feliz quedó con id `97`, `danoEfectivo: 20` (distancia 35) y `mensajeA2` con el nombre del arma creada en A2.
+- Verificación inversa real (sin cambios en el código de A1): se levantó el repo de Luis en 8080 con su `POST /escenarios/comprar-y-disparar` contra A1 y A2 reales. Devuelve 201 con `persistido: true` y `armaId: 1` para precio 2700 y 29 balas; 409 rechazado por César con precio 25000; y 409 rechazado por Giovanni con `balasCargador: 0`.
 
 ---
 
