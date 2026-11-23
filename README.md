@@ -43,22 +43,22 @@ Enunciado verificado: [consigna](https://github.com/alefq/afq-taller-git-2024/bl
 
 | Documento | URL |
 |---|---|
-| Documento OpenAPI 3 de A1 | `http://localhost:8080/v3/api-docs` |
-| Swagger UI de A1 | `http://localhost:8080/swagger-ui.html` |
+| Documento OpenAPI 3 de A1 | `http://localhost:8081/v3/api-docs` |
+| Swagger UI de A1 | `http://localhost:8081/swagger-ui.html` |
 
 El documento incluye el CRUD (`/api/armas`), la simulación (`/api/simulacion/**`), las dos reglas publicadas (`/api/reglas/disparo` y `/api/reglas/recarga`, con respuestas 200 y 400 y ejemplos) y el escenario (`/api/escenarios`, con respuestas 201, 409 y 502). Un compañero puede importarlo sin ver el código Java: no necesita las clases ni los repositorios de A1.
 
 ### Mapa A1 / A2 / A3 y reglas citadas
 
-**Estado del grupo:** el challenge es individual y la nota es individual; el grupo sólo acuerda a quién se consulta. A2 y A3 son los dos compañeros de CS2 ya elegidos, pero sus nombres, repositorios y URLs **todavía no fueron confirmados**. Las celdas marcadas como `PENDIENTE` se completan en el paso de colaboración; el código y la colección ya aceptan esas URLs por configuración.
+**Estado del grupo:** acuerdo por orden alfabético de apellido — A1 Giovanni Monteggia, A2 César Ramírez, A3 Luis Tauber. Puertos acordados: A3 8080, A1 8081, A2 8082. El challenge es individual y la nota es individual; el grupo sólo acuerda a quién se consulta. Todavía faltan los links a los repositorios y a los OpenAPI de A2 y A3, y la frase exacta de sus reglas; esas celdas se completan en cuanto los compartan.
 
 | Rol | Estudiante / servicio | URL base | URL del OpenAPI | Regla que se consulta (en una frase) |
 |---|---|---|---|---|
-| A1 | Sergio Giovanni Monteggia Ortega (este repositorio) | `http://localhost:8080` | `http://localhost:8080/v3/api-docs` | Disparo: con munición, daño y precisión válidos, calcula el daño efectivo según la distancia. Recarga: si hay espacio y reserva, transfiere `min(espacio, reserva)`. |
-| A2 | Compañero 1 de CS2 — **PENDIENTE** | `PENDIENTE` | `PENDIENTE` | **PENDIENTE**: se citará en una frase desde su OpenAPI. |
-| A3 | Compañero 2 de CS2 — **PENDIENTE** | `PENDIENTE` | `PENDIENTE` | **PENDIENTE**: se citará en una frase desde su OpenAPI. |
+| A1 | Sergio Giovanni Monteggia Ortega (este repositorio) | `http://localhost:8081` | `http://localhost:8081/v3/api-docs` | Disparo: con munición, daño y precisión válidos, calcula el daño efectivo según la distancia. Recarga: si hay espacio y reserva, transfiere `min(espacio, reserva)`. |
+| A2 | César Ramírez — **PENDIENTE de repo y OpenAPI** | `http://localhost:8082` | **PENDIENTE** | Propuesta: validación de disparo. **PENDIENTE** de citar en una frase desde su OpenAPI. |
+| A3 | Luis Tauber — **PENDIENTE de repo y OpenAPI** | `http://localhost:8080` | **PENDIENTE** | Propuesta: validación de recarga. **PENDIENTE** de citar en una frase desde su OpenAPI. |
 
-Por defecto este proyecto mapea A2 a la regla de disparo (`companeros.a2.validar-path=/api/reglas/disparo`) y A3 a la de recarga (`companeros.a3.validar-path=/api/reglas/recarga`). Cuando se conozcan los OpenAPI ajenos se ajustan esas dos propiedades y las reglas citadas; no se copia código del compañero.
+El escenario propuesto mapea A2 (César) a la regla de disparo (`companeros.a2.validar-path=/api/reglas/disparo`) y A3 (Luis) a la de recarga (`companeros.a3.validar-path=/api/reglas/recarga`). Cuando se conozcan los OpenAPI ajenos se ajustan esas dos propiedades, los nombres de campo leídos y las reglas citadas; no se copia código del compañero.
 
 ### Escenario en una frase
 
@@ -70,12 +70,12 @@ Con un rifle y un jugador persistidos en A1, `POST /api/escenarios` simula un di
 
 | Propiedad | Variable de entorno | Valor por defecto (prueba local) |
 |---|---|---|
-| `companeros.a2.base-url` | `COMPANEROS_A2_BASE_URL` | `http://localhost:8080` |
+| `companeros.a2.base-url` | `COMPANEROS_A2_BASE_URL` | `http://localhost:8081` |
 | `companeros.a2.validar-path` | `COMPANEROS_A2_VALIDAR_PATH` | `/api/reglas/disparo` |
-| `companeros.a2.openapi-url` | `COMPANEROS_A2_OPENAPI_URL` | `http://localhost:8080/v3/api-docs` |
-| `companeros.a3.base-url` | `COMPANEROS_A3_BASE_URL` | `http://localhost:8080` |
+| `companeros.a2.openapi-url` | `COMPANEROS_A2_OPENAPI_URL` | `http://localhost:8081/v3/api-docs` |
+| `companeros.a3.base-url` | `COMPANEROS_A3_BASE_URL` | `http://localhost:8081` |
 | `companeros.a3.validar-path` | `COMPANEROS_A3_VALIDAR_PATH` | `/api/reglas/recarga` |
-| `companeros.a3.openapi-url` | `COMPANEROS_A3_OPENAPI_URL` | `http://localhost:8080/v3/api-docs` |
+| `companeros.a3.openapi-url` | `COMPANEROS_A3_OPENAPI_URL` | `http://localhost:8081/v3/api-docs` |
 
 Los valores por defecto apuntan a este mismo servicio para poder verificar el escenario sin los compañeros. En la entrega real se reemplazan por las URLs de A2 y A3.
 
@@ -95,16 +95,17 @@ El orden es A2 y después A3 porque sin un disparo válido no tiene sentido pedi
 Cada servicio se clona y se arranca desde su propio repositorio con `./mvnw spring-boot:run`. En una misma máquina se usan puertos distintos:
 
 ```powershell
-# Terminal 1 — A1 (este repositorio)
-$env:COMPANEROS_A2_BASE_URL="http://localhost:8081"
-$env:COMPANEROS_A3_BASE_URL="http://localhost:8082"
+# Terminal 1 — A3 (Luis Tauber): puerto 8080, valor por defecto
+cd <repo de Luis Tauber>
 .\mvnw.cmd spring-boot:run
 
-# Terminal 2 — A2 (repositorio del compañero 1)
-$env:SERVER_PORT=8081
+# Terminal 2 — A1 (este repositorio): puerto 8081 (server.port=8081)
+$env:COMPANEROS_A2_BASE_URL="http://localhost:8082"
+$env:COMPANEROS_A3_BASE_URL="http://localhost:8080"
 .\mvnw.cmd spring-boot:run
 
-# Terminal 3 — A3 (repositorio del compañero 2)
+# Terminal 3 — A2 (César Ramírez): puerto 8082
+cd <repo de César Ramírez>
 $env:SERVER_PORT=8082
 .\mvnw.cmd spring-boot:run
 ```
@@ -113,7 +114,7 @@ Si los servicios están en otras máquinas, se reemplazan `localhost` por las IP
 
 ### Verificación local sin los compañeros
 
-Sin cambiar propiedades, A2 y A3 apuntan a `http://localhost:8080`, así que se puede probar todo con un solo servicio:
+Sin cambiar propiedades, A2 y A3 apuntan a `http://localhost:8081`, así que se puede probar todo con un solo servicio:
 
 1. Arrancar A1 y crear un jugador con `POST /api/simulacion/jugadores` (reserva 90).
 2. Crear un rifle de 30 balas con `POST /api/armas`, guardar su ID y disparar una vez para dejarlo en 29/30.
@@ -203,7 +204,7 @@ El endpoint `GET /api/simulacion/acciones/{armaId}` consulta un arma persistida 
 
 ## Endpoints REST
 
-La dirección base de la aplicación es `http://localhost:8080`.
+La dirección base de la aplicación es `http://localhost:8081`.
 
 ### 1. CRUD persistente de armas
 
@@ -318,7 +319,7 @@ La configuración está en `src/main/resources/application.properties`.
 
 La consola H2 está disponible en:
 
-`http://localhost:8080/h2-console`
+`http://localhost:8081/h2-console`
 
 Datos de conexión:
 
@@ -528,7 +529,7 @@ En Linux o macOS:
 ./mvnw spring-boot:run
 ```
 
-La aplicación queda disponible en `http://localhost:8080`.
+La aplicación queda disponible en `http://localhost:8081`.
 
 Para ejecutar las pruebas automatizadas desde otra terminal:
 
@@ -547,7 +548,7 @@ En Linux o macOS:
 1. Abrir Insomnia.
 2. Seleccionar la opción para importar datos.
 3. Importar `insomnia/CS2-API-2026.json` desde la raíz del repositorio.
-4. Configurar `base_url` con el valor `http://localhost:8080`.
+4. Configurar `base_url` con el valor `http://localhost:8081`.
 5. Crear el arma y el jugador necesarios para la simulación y guardar los IDs devueltos para las solicitudes siguientes.
 
 La colección incluye la solicitud `GET /`, que comprueba la disponibilidad del servicio y devuelve:
@@ -573,7 +574,7 @@ Las pruebas deben utilizar IDs reales y un estado del arma preparado para cada c
 
 ### Consultar la base H2
 
-Abrir `http://localhost:8080/h2-console` y conectarse con los siguientes datos:
+Abrir `http://localhost:8081/h2-console` y conectarse con los siguientes datos:
 
 - **JDBC URL:** `jdbc:h2:file:./data/cs2db;DB_CLOSE_ON_EXIT=FALSE`
 - **Usuario:** `sa`

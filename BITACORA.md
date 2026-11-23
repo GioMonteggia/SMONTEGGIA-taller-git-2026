@@ -169,7 +169,7 @@ Se trabajó con Spring Data JPA y H2 para almacenar las armas y los jugadores.
 La consola web de H2 se encuentra disponible en la siguiente dirección cuando la aplicación está iniciada:
 
 ```text
-http://localhost:8080/h2-console
+http://localhost:8081/h2-console
 ```
 
 La configuración utilizada para la base de datos local fue:

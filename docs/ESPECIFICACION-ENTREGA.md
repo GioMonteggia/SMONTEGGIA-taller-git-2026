@@ -21,7 +21,7 @@ Esta especificación documenta el modelo, la arquitectura, las reglas de negocio
 
 ## 3. Direcciones y recursos
 
-- API local: `http://localhost:8080`
+- API local: `http://localhost:8081`
 - Endpoint de comprobación: `GET /`
 - CRUD persistente de armas: `/api/armas`
 - Jugadores: `/api/simulacion/jugadores`
@@ -29,15 +29,16 @@ Esta especificación documenta el modelo, la arquitectura, las reglas de negocio
 - Disparo: `/api/simulacion/disparar`
 - Recarga: `/api/simulacion/recargar`
 - Recarga mediante `AccionCombate`: `/api/simulacion/acciones/{armaId}/recargar`
-- Consola H2: `http://localhost:8080/h2-console`
-- Documento OpenAPI de A1: `http://localhost:8080/v3/api-docs`
-- Swagger UI de A1: `http://localhost:8080/swagger-ui.html`
+- Consola H2: `http://localhost:8081/h2-console`
+- Documento OpenAPI de A1: `http://localhost:8081/v3/api-docs`
+- Swagger UI de A1: `http://localhost:8081/swagger-ui.html`
 - Regla de disparo publicada: `POST /api/reglas/disparo`
 - Regla de recarga publicada: `POST /api/reglas/recarga`
 - Escenario con A2 y A3: `POST /api/escenarios`
 - Colección de Insomnia de POO-08: `insomnia/CS2-API-2026.json`
 - Colección de Insomnia de POO-09: `insomnia/POO-09-APIS-CRUZADAS.json`
 - Repositorio: https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026
+- Roles acordados por orden alfabético de apellido: A1 Giovanni Monteggia (puerto 8081), A2 César Ramírez (puerto 8082), A3 Luis Tauber (puerto 8080).
 
 ## 4. Modelo y persistencia
 
@@ -142,7 +143,7 @@ Por ejemplo, si un rifle tiene 29 balas y su capacidad máxima es 30, modificar 
 
 ## 7. Endpoints REST
 
-La dirección base es `http://localhost:8080`.
+La dirección base es `http://localhost:8081`.
 
 ### 7.1. CRUD persistente de armas
 
@@ -278,7 +279,7 @@ La configuración se encuentra en `src/main/resources/application.properties`.
 - **JDBC URL:** `jdbc:h2:file:./data/cs2db;DB_CLOSE_ON_EXIT=FALSE`
 - **Usuario:** `sa`
 - **Contraseña:** vacía
-- **Consola web:** `http://localhost:8080/h2-console`
+- **Consola web:** `http://localhost:8081/h2-console`
 
 El proyecto incluye el módulo `spring-boot-h2console` necesario para habilitar la consola web con la versión de Spring Boot utilizada.
 
@@ -312,7 +313,7 @@ En Linux o macOS:
 ./mvnw test
 ```
 
-La API queda disponible en `http://localhost:8080`.
+La API queda disponible en `http://localhost:8081`.
 
 ## 12. Verificación con Insomnia
 
@@ -322,7 +323,7 @@ Para utilizarla:
 
 1. Abrir Insomnia.
 2. Importar la colección del proyecto.
-3. Configurar `base_url` con el valor `http://localhost:8080`.
+3. Configurar `base_url` con el valor `http://localhost:8081`.
 4. Crear los recursos necesarios para las pruebas y guardar los identificadores devueltos.
 
 La colección incluye una solicitud `GET /` que comprueba que el servicio responde:

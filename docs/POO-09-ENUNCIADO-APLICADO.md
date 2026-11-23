@@ -30,20 +30,20 @@ El challenge es individual y la nota es individual; el grupo sólo acuerda a qui
 
 | Rol | Estudiante / servicio | URL base | URL del OpenAPI | Regla que se consulta (en una frase) |
 |---|---|---|---|---|
-| A1 | Sergio Giovanni Monteggia Ortega — este repositorio | `http://localhost:8080` | `http://localhost:8080/v3/api-docs` | Publica dos reglas: disparo válido calcula el daño efectivo según distancia y precisión; recarga transfiere `min(espacio libre, reserva)`. |
-| A2 | Compañero 1 de CS2 — **PENDIENTE de confirmar nombre** | **PENDIENTE** | **PENDIENTE** | **PENDIENTE**: se citará en una frase leyendo su OpenAPI. |
-| A3 | Compañero 2 de CS2 — **PENDIENTE de confirmar nombre** | **PENDIENTE** | **PENDIENTE** | **PENDIENTE**: se citará en una frase leyendo su OpenAPI. |
+| A1 | Sergio Giovanni Monteggia Ortega — este repositorio | `http://localhost:8081` | `http://localhost:8081/v3/api-docs` | Publica dos reglas: disparo válido calcula el daño efectivo según distancia y precisión; recarga transfiere `min(espacio libre, reserva)`. |
+| A2 | César Ramírez — **PENDIENTE de repo y OpenAPI** | `http://localhost:8082` | **PENDIENTE** | Propuesta: validación de disparo. **PENDIENTE** de citar en una frase leyendo su OpenAPI. |
+| A3 | Luis Tauber — **PENDIENTE de repo y OpenAPI** | `http://localhost:8080` | **PENDIENTE** | Propuesta: validación de recarga. **PENDIENTE** de citar en una frase leyendo su OpenAPI. |
 
-**Por qué siguen pendientes:** el usuario informó que todavía no tiene los datos de los compañeros. No se inventaron nombres ni URLs. El código ya los acepta por configuración:
+**Acuerdo de roles y puertos:** por orden alfabético de apellido, A1 Giovanni Monteggia (8081), A2 César Ramírez (8082) y A3 Luis Tauber (8080). Los roles y puertos ya están confirmados; siguen pendientes los links a los repositorios, los OpenAPI y la frase exacta de las reglas ajenas. No se inventaron URLs. El código ya los acepta por configuración:
 
 | Propiedad | Variable de entorno | Valor actual (verificación local) |
 |---|---|---|
-| `companeros.a2.base-url` | `COMPANEROS_A2_BASE_URL` | `http://localhost:8080` |
+| `companeros.a2.base-url` | `COMPANEROS_A2_BASE_URL` | `http://localhost:8081` |
 | `companeros.a2.validar-path` | `COMPANEROS_A2_VALIDAR_PATH` | `/api/reglas/disparo` |
-| `companeros.a2.openapi-url` | `COMPANEROS_A2_OPENAPI_URL` | `http://localhost:8080/v3/api-docs` |
-| `companeros.a3.base-url` | `COMPANEROS_A3_BASE_URL` | `http://localhost:8080` |
+| `companeros.a2.openapi-url` | `COMPANEROS_A2_OPENAPI_URL` | `http://localhost:8081/v3/api-docs` |
+| `companeros.a3.base-url` | `COMPANEROS_A3_BASE_URL` | `http://localhost:8081` |
 | `companeros.a3.validar-path` | `COMPANEROS_A3_VALIDAR_PATH` | `/api/reglas/recarga` |
-| `companeros.a3.openapi-url` | `COMPANEROS_A3_OPENAPI_URL` | `http://localhost:8080/v3/api-docs` |
+| `companeros.a3.openapi-url` | `COMPANEROS_A3_OPENAPI_URL` | `http://localhost:8081/v3/api-docs` |
 
 Los valores por defecto apuntan a este mismo servicio para poder ejecutar el escenario con una sola instancia. **Esto no sustituye el round robin real**: en cuanto se conozcan los OpenAPI ajenos se reemplazan las URLs, las rutas de validación y las reglas citadas, sin copiar código del compañero.
 
@@ -71,16 +71,17 @@ La jugada guarda descripción, IDs de rifle y jugador, distancia, daño efectivo
 Cada servicio se clona y se arranca desde su repositorio con `./mvnw spring-boot:run`. En una misma máquina se usan puertos distintos:
 
 ```powershell
-# Terminal 1 — A1 (este repositorio)
-$env:COMPANEROS_A2_BASE_URL="http://localhost:8081"
-$env:COMPANEROS_A3_BASE_URL="http://localhost:8082"
+# Terminal 1 — A3 (Luis Tauber): puerto 8080, valor por defecto
+cd <repo de Luis Tauber>
 .\mvnw.cmd spring-boot:run
 
-# Terminal 2 — A2 (repositorio del compañero 1)
-$env:SERVER_PORT=8081
+# Terminal 2 — A1 (este repositorio): puerto 8081 (server.port=8081)
+$env:COMPANEROS_A2_BASE_URL="http://localhost:8082"
+$env:COMPANEROS_A3_BASE_URL="http://localhost:8080"
 .\mvnw.cmd spring-boot:run
 
-# Terminal 3 — A3 (repositorio del compañero 2)
+# Terminal 3 — A2 (César Ramírez): puerto 8082
+cd <repo de César Ramírez>
 $env:SERVER_PORT=8082
 .\mvnw.cmd spring-boot:run
 ```

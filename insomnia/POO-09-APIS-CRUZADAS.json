@@ -22,8 +22,8 @@
       "modified": 1795400000002,
       "isPrivate": false,
       "data": {
-        "a1_base_url": "http://localhost:8080",
-        "a2_base_url": "http://localhost:8080",
+        "a1_base_url": "http://localhost:8081",
+        "a2_base_url": "http://localhost:8082",
         "a3_base_url": "http://localhost:8080",
         "rifleId": "REEMPLAZAR_CON_ID",
         "jugadorId": "REEMPLAZAR_CON_ID",
