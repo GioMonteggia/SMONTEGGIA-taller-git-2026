@@ -50,7 +50,7 @@ El documento incluye el CRUD (`/api/armas`), la simulación (`/api/simulacion/**
 
 ### Mapa A1 / A2 / A3 y reglas citadas
 
-**Estado del grupo:** acuerdo por orden alfabético de apellido — A1 Giovanni Monteggia, A2 César Ramírez, A3 Luis Tauber. Puertos acordados: A3 8080, A1 8081, A2 8082. El challenge es individual y la nota es individual; el grupo sólo acuerda a quién se consulta. A2 (César Ramírez) y A3 (Luis Tauber) enviaron repo, URL base y regla. El OpenAPI de A2 figura con la URL informada, aunque al verificar el `HEAD` publicado de su repo `/v3/api-docs` devolvió 404; ver `BITACORA.md`.
+**Estado del grupo:** acuerdo por orden alfabético de apellido — A1 Giovanni Monteggia, A2 César Ramírez, A3 Luis Tauber. Puertos acordados: A3 8080, A1 8081, A2 8082. El challenge es individual y la nota es individual; el grupo sólo acuerda a quién se consulta. A2 (César Ramírez) y A3 (Luis Tauber) enviaron repo, URL base y regla. El OpenAPI de A2 figura con la URL informada; el 404 observado en el `HEAD` anterior (`f7a060b`) quedó resuelto en el commit final `24921ac` de la rama `poo09-apis-cruzadas`, donde `/v3/api-docs` y `/swagger-ui/index.html` responden 200; ver `BITACORA.md`.
 
 | Rol | Estudiante / servicio | URL base | URL del OpenAPI | Regla que se consulta (en una frase) |
 |---|---|---|---|---|

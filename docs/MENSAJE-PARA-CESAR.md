@@ -70,3 +70,7 @@ robin real dio:
 - Rechazo de A2: HTTP 409, `rechazadoPor: "A2"`, `codigoHttpCompanero: 422`.
 - Rechazo de A3: HTTP 409, `rechazadoPor: "A3"`, `codigoHttpCompanero: 200`.
 - Conteo de jugadas: 2 → 3 → 3 → 3; ningún rechazo persistió.
+
+## Cierre final
+
+César migró su cliente hacia A1 al endpoint sin IDs `POST /api/reglas/disparo` y publicó su OpenAPI en la rama `poo09-apis-cruzadas` (commits `24921ac` de código y `376ea13` de documentación), con springdoc 3.2.0; verificado 200 en `/v3/api-docs` y `/swagger-ui/index.html` en 8082.

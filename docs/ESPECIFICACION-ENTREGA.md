@@ -40,7 +40,7 @@ Esta especificación documenta el modelo, la arquitectura, las reglas de negocio
 - Repositorio: https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026
 - Roles acordados por orden alfabético de apellido: A1 Giovanni Monteggia (puerto 8081), A2 César Ramírez (puerto 8082), A3 Luis Tauber (puerto 8080).
 - A3 publica su regla en `http://localhost:8080/v3/api-docs` (repo: https://github.com/LTP22/ltauber-tp-lp3-2026). Un arma de fuego necesita munición para disparar y una granada no se puede lanzar dos veces; validada en `POST /api/reglas/combate` con `{tieneBalas, granadaLanzada}`. Responde HTTP 200 con `aceptada: true` o `false`, y el cliente distingue el rechazo por ese campo.
-- A2 informó su regla en `http://localhost:8082/v3/api-docs` (repo: https://github.com/cesarraa/crr-taller-git-2026). El precio del arma debe estar entre $0 y $16.000; validada en `POST /api/armas` con 201 si cumple y 422 con `codigo: CS2_ECONOMIA_EXCEDIDA` si no. Al verificar el `HEAD` publicado de su repo, `/v3/api-docs` devolvió 404 (ver `BITACORA.md`).
+- A2 informó su regla en `http://localhost:8082/v3/api-docs` (repo: https://github.com/cesarraa/crr-taller-git-2026). El precio del arma debe estar entre $0 y $16.000; validada en `POST /api/armas` con 201 si cumple y 422 con `codigo: CS2_ECONOMIA_EXCEDIDA` si no. Al verificar el commit final `24921ac` de su rama `poo09-apis-cruzadas`, `/v3/api-docs` y `/swagger-ui/index.html` responden 200 (el 404 era del `HEAD` anterior `f7a060b`); ver `BITACORA.md`.
 
 ## 4. Modelo y persistencia
 
@@ -376,7 +376,7 @@ Resultados adicionales de POO-09:
 
 - `/v3/api-docs` y `/swagger-ui.html`: HTTP 200, con las rutas `/api/reglas/*` y `/api/escenarios` documentadas.
 - Escenario con A2 y A3 apuntando al propio servicio: HTTP 201, `danoEfectivo: 15`, `municionTransferida: 1` y una jugada nueva en `GET /api/escenarios`.
-- Rechazo de A2 (rifle con precio 25000): HTTP 409 con `rechazadoPor: "A2"`, `codigoHttpCompanero: 422` y mensaje «El precio $25000.0 supera el tope de $16,000 en la economía de CS2.»; A3 no se consulta y la cantidad de jugadas no cambia.
+- Rechazo de A2 (rifle con precio 25000): HTTP 409 con `rechazadoPor: "A2"`, `codigoHttpCompanero: 422` y mensaje «El precio $25000.00 viola la regla económica de CS2 (rango reglamentario: $0 a $16,000).»; A3 no se consulta y la cantidad de jugadas no cambia.
 - Rechazo de A3 (cargador lleno): HTTP 409 con `rechazadoPor: "A3"`; la cantidad de jugadas no cambia.
 - Conteo de jugadas observado: `0 → 1 → 1 → 1`.
 - Pruebas automatizadas: `Tests run: 19, Failures: 0, Errors: 0, Skipped: 0`.

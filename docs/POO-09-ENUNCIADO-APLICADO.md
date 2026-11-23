@@ -34,7 +34,7 @@ El challenge es individual y la nota es individual; el grupo sólo acuerda a qui
 | A2 | César Ramírez — https://github.com/cesarraa/crr-taller-git-2026 | `http://localhost:8082` | `http://localhost:8082/v3/api-docs` (informado; ver nota) | El precio del arma debe estar entre $0 y $16.000; validada en `POST /api/armas` (201 si cumple, 422 con `codigo: CS2_ECONOMIA_EXCEDIDA` si no). |
 | A3 | Luis Tauber — https://github.com/LTP22/ltauber-tp-lp3-2026 | `http://localhost:8080` | `http://localhost:8080/v3/api-docs` | Un arma de fuego necesita munición para disparar y una granada no se puede lanzar dos veces; validada en `POST /api/reglas/combate` con `{tieneBalas, granadaLanzada}`. |
 
-**Acuerdo de roles y puertos:** por orden alfabético de apellido, A1 Giovanni Monteggia (8081), A2 César Ramírez (8082) y A3 Luis Tauber (8080). Los roles, puertos y reglas ya están confirmados. A2 (César Ramírez) y A3 (Luis Tauber) enviaron sus repositorios, URLs base y reglas, ya citadas arriba. El OpenAPI de A2 se documenta con la URL informada; al verificar el `HEAD` publicado de su repo, `/v3/api-docs` devolvió 404 (ver `BITACORA.md`). No se inventaron URLs; el código ya los acepta por configuración:
+**Acuerdo de roles y puertos:** por orden alfabético de apellido, A1 Giovanni Monteggia (8081), A2 César Ramírez (8082) y A3 Luis Tauber (8080). Los roles, puertos y reglas ya están confirmados. A2 (César Ramírez) y A3 (Luis Tauber) enviaron sus repositorios, URLs base y reglas, ya citadas arriba. El OpenAPI de A2 se documenta con la URL informada; el 404 del `HEAD` anterior quedó resuelto en el commit final `24921ac` de su rama `poo09-apis-cruzadas`, verificado con 200 en `/v3/api-docs` y `/swagger-ui/index.html` (ver `BITACORA.md`). No se inventaron URLs; el código ya los acepta por configuración:
 
 | Propiedad | Variable de entorno | Valor actual (verificación local) |
 |---|---|---|
@@ -107,10 +107,11 @@ La colección incluye respuestas de ejemplo exportadas para el feliz y para cada
 - `Tests run: 23, Failures: 0, Errors: 0, Skipped: 0`.
 - `/v3/api-docs` y `/swagger-ui.html`: HTTP 200; el documento incluye CRUD, simulación, `/api/reglas/disparo`, `/api/reglas/recarga` y `/api/escenarios` con respuestas 201, 400, 409 y 502.
 - Round robin real: se clonaron los repos de César y Luis en carpetas temporales y se levantaron en 8082 y 8080. Camino feliz: HTTP 201 con `aceptadaPorA2: true` y `aceptadaPorA3: true`.
-- Rechazo real de A2 con un rifle de precio 25000: HTTP 409, `rechazadoPor: "A2"`, `codigoHttpCompanero: 422` y mensaje «El precio $25000.0 supera el tope de $16,000 en la economía de CS2.».
+- Rechazo real de A2 con un rifle de precio 25000: HTTP 409, `rechazadoPor: "A2"`, `codigoHttpCompanero: 422` y mensaje «El precio $25000.00 viola la regla económica de CS2 (rango reglamentario: $0 a $16,000).».
 - Rechazo real de A3 con `granadaLanzada: true`: HTTP 409, `rechazadoPor: "A3"`, `codigoHttpCompanero: 200` y mensaje «La granada ya fue lanzada.».
 - Conteo de jugadas en la verificación final: `2 → 3 → 3 → 3` (ningún rechazo dejó rastro). La jugada feliz quedó con id `97`, `danoEfectivo: 20` (distancia 35) y `mensajeA2` con el nombre del arma creada en A2.
 - Verificación inversa real (sin cambios en el código de A1): se levantó el repo de Luis en 8080 con su `POST /escenarios/comprar-y-disparar` contra A1 y A2 reales. Devuelve 201 con `persistido: true` y `armaId: 1` para precio 2700 y 29 balas; 409 rechazado por César con precio 25000; y 409 rechazado por Giovanni con `balasCargador: 0`. Tras el fix de Luis en `665f8d0`, este último `motivo` quedó limpio: «El rifle no tiene munición.».
+- Reverificación final con el commit de César `24921ac`: los tres OpenAPI responden 200; el round robin volvió a dar 201 (`danoEfectivo: 20`, jugada id 129, conteo `3 → 4 → 4 → 4`) y los dos rechazos 409 sin persistir.
 
 ---
 
