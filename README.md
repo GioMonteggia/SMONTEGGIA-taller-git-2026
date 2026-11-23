@@ -50,34 +50,34 @@ El documento incluye el CRUD (`/api/armas`), la simulación (`/api/simulacion/**
 
 ### Mapa A1 / A2 / A3 y reglas citadas
 
-**Estado del grupo:** acuerdo por orden alfabético de apellido — A1 Giovanni Monteggia, A2 César Ramírez, A3 Luis Tauber. Puertos acordados: A3 8080, A1 8081, A2 8082. El challenge es individual y la nota es individual; el grupo sólo acuerda a quién se consulta. Todavía faltan los links a los repositorios y a los OpenAPI de A2 y A3, y la frase exacta de sus reglas; esas celdas se completan en cuanto los compartan.
+**Estado del grupo:** acuerdo por orden alfabético de apellido — A1 Giovanni Monteggia, A2 César Ramírez, A3 Luis Tauber. Puertos acordados: A3 8080, A1 8081, A2 8082. El challenge es individual y la nota es individual; el grupo sólo acuerda a quién se consulta. A3 (Luis Tauber) ya envió repo, OpenAPI y regla. Falta la información equivalente de A2 (César Ramírez); esa celda se completa en cuanto la comparta.
 
 | Rol | Estudiante / servicio | URL base | URL del OpenAPI | Regla que se consulta (en una frase) |
 |---|---|---|---|---|
 | A1 | Sergio Giovanni Monteggia Ortega (este repositorio) | `http://localhost:8081` | `http://localhost:8081/v3/api-docs` | Disparo: con munición, daño y precisión válidos, calcula el daño efectivo según la distancia. Recarga: si hay espacio y reserva, transfiere `min(espacio, reserva)`. |
 | A2 | César Ramírez — **PENDIENTE de repo y OpenAPI** | `http://localhost:8082` | **PENDIENTE** | Propuesta: validación de disparo. **PENDIENTE** de citar en una frase desde su OpenAPI. |
-| A3 | Luis Tauber — **PENDIENTE de repo y OpenAPI** | `http://localhost:8080` | **PENDIENTE** | Propuesta: validación de recarga. **PENDIENTE** de citar en una frase desde su OpenAPI. |
+| A3 | Luis Tauber — https://github.com/LTP22/ltauber-tp-lp3-2026 | `http://localhost:8080` | `http://localhost:8080/v3/api-docs` | Un arma de fuego necesita munición para disparar y una granada no se puede lanzar dos veces; validada en `POST /api/reglas/combate` con `{tieneBalas, granadaLanzada}`. |
 
-El escenario propuesto mapea A2 (César) a la regla de disparo (`companeros.a2.validar-path=/api/reglas/disparo`) y A3 (Luis) a la de recarga (`companeros.a3.validar-path=/api/reglas/recarga`). Cuando se conozcan los OpenAPI ajenos se ajustan esas dos propiedades, los nombres de campo leídos y las reglas citadas; no se copia código del compañero.
+El escenario mapea A2 (César) a la validación de disparo (`companeros.a2.validar-path=/api/reglas/disparo`, pendiente de su confirmación) y A3 (Luis) a su regla real (`companeros.a3.validar-path=/api/reglas/combate`). El cliente lee los nombres de campo publicados por cada OpenAPI, sin importar clases del proyecto ajeno.
 
 ### Escenario en una frase
 
-Con un rifle y un jugador persistidos en A1, `POST /api/escenarios` simula un disparo con recarga parcial: **A2 valida el disparo, A3 valida la recarga y A1 guarda la jugada en su H2 sólo si los dos aceptan**; un `GET /api/escenarios` la vuelve a mostrar.
+Con un rifle y un jugador persistidos en A1, `POST /api/escenarios` simula **un disparo con lanzamiento de granada: A2 valida el disparo, A3 valida que haya balas y que la granada no se lance dos veces, y A1 guarda la jugada en su H2 sólo si los dos aceptan**; un `GET /api/escenarios` la vuelve a mostrar. El cuerpo admite `granadaLanzada` (opcional, por defecto `false`) para provocar el rechazo de A3.
 
 ### Cliente y configuración
 
-`CompaneroRestClient` usa `RestClient` y `ObjectMapper`. Lee la respuesta del compañero por los nombres de campo del OpenAPI (`aceptada`, `mensaje`, `danoEfectivo`, `municionTransferida`) y no importa clases del proyecto ajeno. Las URLs se configuran en `application.properties` y se pueden sobreescribir con variables de entorno:
+`CompaneroRestClient` usa `RestClient` y `ObjectMapper`. Lee la respuesta por los nombres de campo del OpenAPI (`aceptada`, `mensaje`, `danoEfectivo`/`danioEfectivo`, `municionTransferida`/`balasTransferidas`); si el compañero no publica un booleano, infiere la aceptación del código HTTP (2xx) y lee el rechazo de `error`. No importa clases del proyecto ajeno. Las URLs se configuran en `application.properties` y se pueden sobreescribir con variables de entorno:
 
 | Propiedad | Variable de entorno | Valor por defecto (prueba local) |
 |---|---|---|
 | `companeros.a2.base-url` | `COMPANEROS_A2_BASE_URL` | `http://localhost:8081` |
 | `companeros.a2.validar-path` | `COMPANEROS_A2_VALIDAR_PATH` | `/api/reglas/disparo` |
 | `companeros.a2.openapi-url` | `COMPANEROS_A2_OPENAPI_URL` | `http://localhost:8081/v3/api-docs` |
-| `companeros.a3.base-url` | `COMPANEROS_A3_BASE_URL` | `http://localhost:8081` |
-| `companeros.a3.validar-path` | `COMPANEROS_A3_VALIDAR_PATH` | `/api/reglas/recarga` |
-| `companeros.a3.openapi-url` | `COMPANEROS_A3_OPENAPI_URL` | `http://localhost:8081/v3/api-docs` |
+| `companeros.a3.base-url` | `COMPANEROS_A3_BASE_URL` | `http://localhost:8080` (Luis) |
+| `companeros.a3.validar-path` | `COMPANEROS_A3_VALIDAR_PATH` | `/api/reglas/combate` |
+| `companeros.a3.openapi-url` | `COMPANEROS_A3_OPENAPI_URL` | `http://localhost:8080/v3/api-docs` |
 
-Los valores por defecto apuntan a este mismo servicio para poder verificar el escenario sin los compañeros. En la entrega real se reemplazan por las URLs de A2 y A3.
+A3 ya apunta a su servicio real en el puerto 8080. A2 sigue apuntando a este mismo servicio (`8081`) para poder verificar el escenario de forma local; se reemplaza por la URL de César cuando la comparta. Todo se puede sobreescribir con las variables de entorno.
 
 ### Errores y atribución
 
@@ -88,7 +88,7 @@ Los valores por defecto apuntan a este mismo servicio para poder verificar el es
 | A3 rechaza | HTTP 409 con `rechazadoPor: "A3"` | Sin cambios |
 | Algún compañero no responde | HTTP 502 con `rechazadoPor` y `motivo: "sin respuesta"` | Sin cambios |
 
-El orden es A2 y después A3 porque sin un disparo válido no tiene sentido pedir la recarga. El `save` ocurre recién después de las dos respuestas favorables.
+El orden es A2 y después A3 porque sin un disparo válido no tiene sentido validar el lanzamiento de la granada. El `save` ocurre recién después de las dos respuestas favorables. A3 responde HTTP 200 tanto en la aceptación como en el rechazo; el cliente distingue por el campo `aceptada`.
 
 ### Cómo arrancar los tres servicios
 
@@ -96,7 +96,7 @@ Cada servicio se clona y se arranca desde su propio repositorio con `./mvnw spri
 
 ```powershell
 # Terminal 1 — A3 (Luis Tauber): puerto 8080, valor por defecto
-cd <repo de Luis Tauber>
+cd <clon de https://github.com/LTP22/ltauber-tp-lp3-2026>
 .\mvnw.cmd spring-boot:run
 
 # Terminal 2 — A1 (este repositorio): puerto 8081 (server.port=8081)

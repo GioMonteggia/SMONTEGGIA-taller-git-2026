@@ -127,7 +127,7 @@
       "modified": 1795400000009,
       "method": "GET",
       "url": "{{ a3_base_url }}/v3/api-docs",
-      "description": "Primer contacto con A3: leer su documento, no su código.",
+      "description": "OpenAPI de Luis Tauber (A3), puerto 8080. Contiene `POST /api/reglas/combate`.",
       "headers": [],
       "body": {},
       "authentication": {},
@@ -306,7 +306,7 @@
       "modified": 1795400000016,
       "method": "POST",
       "url": "{{ a1_base_url }}/api/escenarios",
-      "description": "Sólo se llama a A1. Devuelve 201 y la jugada queda en GET /api/escenarios.",
+      "description": "Sólo se llama a A1. A2 valida el disparo y A3 valida munición y granada no reutilizada. Devuelve 201.",
       "headers": [
         {
           "name": "Content-Type",
@@ -315,7 +315,7 @@
       ],
       "body": {
         "mimeType": "application/json",
-        "text": "{\n  \"rifleId\": \"{{ rifleId }}\",\n  \"jugadorId\": \"{{ jugadorId }}\",\n  \"distancia\": 50\n}"
+        "text": "{\n  \"rifleId\": \"{{ rifleId }}\",\n  \"jugadorId\": \"{{ jugadorId }}\",\n  \"distancia\": 50,\n  \"granadaLanzada\": false\n}"
       },
       "authentication": {},
       "metaSortKey": -300,
@@ -380,12 +380,12 @@
       "_id": "req_rechazo_a3",
       "_type": "request",
       "parentId": "fld_rechazos",
-      "name": "Rechazo de A3 (cargador lleno)",
+      "name": "Rechazo de A3 (granada ya lanzada)",
       "created": 1795400000019,
       "modified": 1795400000019,
       "method": "POST",
       "url": "{{ a1_base_url }}/api/escenarios",
-      "description": "A2 acepta y A3 rechaza. HTTP 409 y H2 sin cambios.",
+      "description": "A2 acepta y A3 rechaza con HTTP 200 y `aceptada: false`. A1 devuelve 409 y H2 sin cambios.",
       "headers": [
         {
           "name": "Content-Type",
@@ -394,7 +394,7 @@
       ],
       "body": {
         "mimeType": "application/json",
-        "text": "{\n  \"rifleId\": \"{{ rifleLlenoId }}\",\n  \"jugadorId\": \"{{ jugadorId }}\",\n  \"distancia\": 50\n}"
+        "text": "{\n  \"rifleId\": \"{{ rifleId }}\",\n  \"jugadorId\": \"{{ jugadorId }}\",\n  \"distancia\": 50,\n  \"granadaLanzada\": true\n}"
       },
       "authentication": {},
       "metaSortKey": -390,
@@ -439,7 +439,7 @@
       "created": 1795400000022,
       "modified": 1795400000022,
       "statusCode": 409,
-      "body": "{\n  \"error\": \"A3 rechazó el escenario: El cargador ya está lleno.\",\n  \"rechazadoPor\": \"A3\",\n  \"regla\": \"Validacion de recarga: transferencia parcial desde la reserva\",\n  \"mensajeCompanero\": \"El cargador ya está lleno.\",\n  \"codigoHttpCompanero\": 400\n}",
+      "body": "{\n  \"error\": \"A3 rechazó el escenario: La granada ya fue lanzada.\",\n  \"rechazadoPor\": \"A3\",\n  \"regla\": \"Un arma de fuego necesita munición para disparar y una granada no se puede lanzar dos veces.\",\n  \"mensajeCompanero\": \"La granada ya fue lanzada.\",\n  \"codigoHttpCompanero\": 200\n}",
       "contentType": "application/json",
       "headers": [],
       "elapsed": 12

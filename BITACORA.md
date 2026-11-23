@@ -265,9 +265,9 @@ Con apoyo de IA se realizaron las siguientes tareas independientes, que no depen
 - Se creó la entidad `Jugada` y el servicio `EscenarioService`: consulta A2 y después A3, y guarda en H2 recién después de las dos aceptaciones. Los rechazos no dejan rastro en la base.
 - Se agregó la colección `insomnia/POO-09-APIS-CRUZADAS.json` con los tres OpenAPI, la preparación de datos, el camino feliz y los rechazos por A2 y por A3, con respuestas de ejemplo.
 
-Las pruebas automatizadas pasaron de 6 a 19 (`Failures: 0, Errors: 0`). También se verificaron solicitudes HTTP reales: el camino feliz guardó una jugada (`0 → 1`) y los dos rechazos devolvieron 409 con `rechazadoPor` sin cambiar el conteo (`1 → 1 → 1`).
+Las pruebas automatizadas pasaron de 6 a 23 (`Failures: 0, Errors: 0`). También se verificaron solicitudes HTTP reales: el camino feliz guardó una jugada (`0 → 1`) y los dos rechazos devolvieron 409 con `rechazadoPor` sin cambiar el conteo (`1 → 1 → 1`).
 
-Los nombres, repositorios, URLs y reglas de A2 y A3 todavía no fueron confirmados. Por ese motivo el mapa A1/A2/A3 y el archivo con el enunciado aplicado conservan celdas `PENDIENTE`, y los valores por defecto apuntan a este mismo servicio para permitir la verificación local. Esa verificación no sustituye el round robin real y debe actualizarse en la etapa de colaboración.
+A3 (Luis Tauber) confirmó repo, OpenAPI y regla: valida munición y granada no reutilizada en `POST /api/reglas/combate`, sin IDs de su base. El escenario se reformuló como «disparo con lanzamiento de granada» y el cuerpo de `/api/escenarios` acepta `granadaLanzada` para provocar el rechazo de A3. El cliente distingue la aceptación por el campo `aceptada` incluso cuando A3 responde HTTP 200 en el rechazo. Se clonó el repo de Luis en una carpeta temporal, se levantó su servicio en 8080 y se verificó el round robin real desde A1 (8081): feliz 201 con `aceptadaPorA3: true` y rechazo 409 con `rechazadoPor: "A3"`, sin nuevas jugadas. A2 (César Ramírez) todavía no envió su información, así que esa celda del mapa sigue `PENDIENTE` y su cliente apunta a este servicio para la verificación local.
 
 ## 7. Referencia al código publicado
 

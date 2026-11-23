@@ -20,8 +20,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Escenario propio: disparo con recarga parcial. A2 valida el disparo y A3
- * valida la recarga. Sólo se escribe en H2 cuando los dos aceptan.
+ * Escenario propio: disparo con lanzamiento de granada. A2 valida el disparo y
+ * A3 (Luis) valida que haya balas y que la granada no se lance dos veces.
+ * Sólo se escribe en H2 cuando los dos aceptan.
  */
 @Service
 public class EscenarioService {
@@ -83,19 +84,23 @@ public class EscenarioService {
         datosDisparo.put("precision", rifle.getPrecision());
         datosDisparo.put("distancia", distancia);
 
-        Map<String, Object> datosRecarga = new LinkedHashMap<>();
-        datosRecarga.put("municionActual", rifle.getMunicionActual());
-        datosRecarga.put("municionMax", rifle.getMunicionMax());
-        datosRecarga.put("municionReserva", jugador.getMunicionReserva());
+        // A3 publica /api/reglas/combate con estos dos nombres de campo.
+        // "tieneBalas" sale del rifle persistido y "granadaLanzada" se puede
+        // forzar en la petición para probar el rechazo sin tocar la base.
+        Map<String, Object> datosCombate = new LinkedHashMap<>();
+        datosCombate.put("tieneBalas", rifle.getMunicionActual() > 0);
+        datosCombate.put("granadaLanzada",
+                Boolean.TRUE.equals(solicitud.granadaLanzada()));
 
-        // A2 va primero: sin un disparo válido no tiene sentido pedir recarga.
+        // A2 va primero: sin un disparo válido no tiene sentido pedir el
+        // lanzamiento de la granada.
         ResultadoValidacion respuestaA2 = a2.validar(datosDisparo);
         if (!respuestaA2.aceptada()) {
             throw new RechazoCompaneroException(
                     a2.rol(), a2.regla(), respuestaA2);
         }
 
-        ResultadoValidacion respuestaA3 = a3.validar(datosRecarga);
+        ResultadoValidacion respuestaA3 = a3.validar(datosCombate);
         if (!respuestaA3.aceptada()) {
             throw new RechazoCompaneroException(
                     a3.rol(), a3.regla(), respuestaA3);
@@ -104,7 +109,7 @@ public class EscenarioService {
         // Recién aquí se escribe en la base: un rechazo no deja rastro.
         Jugada jugada = new Jugada(
                 rifle.getNombre() + " dispara a " + distancia
-                        + " m y recarga con la reserva de "
+                        + " m y valida el lanzamiento de granada con "
                         + jugador.getNombre(),
                 rifle.getId(),
                 jugador.getId(),
@@ -139,6 +144,12 @@ public class EscenarioService {
     public record SolicitudEscenario(
             Long rifleId,
             Long jugadorId,
-            Integer distancia) {
+            Integer distancia,
+            Boolean granadaLanzada) {
+
+        public SolicitudEscenario(
+                Long rifleId, Long jugadorId, Integer distancia) {
+            this(rifleId, jugadorId, distancia, false);
+        }
     }
 }

@@ -136,11 +136,12 @@ public class CompaneroRestClient implements ValidadorCompanero {
                     aceptada,
                     mensaje,
                     leerEntero(nodo,
-                            "danoEfectivo", "dañoEfectivo",
+                            "danoEfectivo", "dañoEfectivo", "danioEfectivo",
                             "danioInfligido", "danoRecibido"),
                     leerEntero(nodo,
                             "municionTransferida", "municionATransferir",
-                            "balasRestantes", "municionRestante"),
+                            "balasTransferidas", "balasRestantes",
+                            "municionRestante"),
                     respuesta.getStatusCode().value());
 
         } catch (RestClientException exception) {

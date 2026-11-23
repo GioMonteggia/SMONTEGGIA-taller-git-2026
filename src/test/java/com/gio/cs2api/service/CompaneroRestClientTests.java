@@ -94,6 +94,41 @@ class CompaneroRestClientTests {
     }
 
     @Test
+    void unRechazoConHttp200YCampoAceptadaFalseSeInterpretaComoRechazo() {
+        RestClient.Builder constructor = RestClient.builder();
+        MockRestServiceServer servidorRechazo =
+                MockRestServiceServer.bindTo(constructor).build();
+        CompaneroRestClient clienteA3 = new CompaneroRestClient(
+                "A3",
+                "regla de combate",
+                "http://companero.test",
+                "/api/reglas/combate",
+                new ObjectMapper(),
+                constructor);
+
+        servidorRechazo
+                .expect(requestTo("http://companero.test/api/reglas/combate"))
+                .andExpect(method(HttpMethod.POST))
+                .andExpect(content().json(
+                        "{\"tieneBalas\":true,\"granadaLanzada\":true}"))
+                .andRespond(withSuccess(
+                        "{\"aceptada\":false,\"mensaje\":\"La granada ya fue lanzada.\","
+                        + "\"danioEfectivo\":null,\"balasTransferidas\":null}",
+                        MediaType.APPLICATION_JSON));
+
+        Map<String, Object> datos = new LinkedHashMap<>();
+        datos.put("tieneBalas", true);
+        datos.put("granadaLanzada", true);
+
+        var resultado = clienteA3.validar(datos);
+
+        assertFalse(resultado.aceptada());
+        assertEquals("La granada ya fue lanzada.", resultado.mensaje());
+        assertEquals(200, resultado.codigoHttp());
+        servidorRechazo.verify();
+    }
+
+    @Test
     void enModoQueryInfirmaLaAceptacionDelCodigoHttpSinCampoBooleano() {
         RestClient.Builder constructor = RestClient.builder();
         MockRestServiceServer servidorQuery =

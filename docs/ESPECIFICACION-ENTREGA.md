@@ -39,6 +39,7 @@ Esta especificación documenta el modelo, la arquitectura, las reglas de negocio
 - Colección de Insomnia de POO-09: `insomnia/POO-09-APIS-CRUZADAS.json`
 - Repositorio: https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026
 - Roles acordados por orden alfabético de apellido: A1 Giovanni Monteggia (puerto 8081), A2 César Ramírez (puerto 8082), A3 Luis Tauber (puerto 8080).
+- A3 publica su regla en `http://localhost:8080/v3/api-docs` (repo: https://github.com/LTP22/ltauber-tp-lp3-2026). Un arma de fuego necesita munición para disparar y una granada no se puede lanzar dos veces; validada en `POST /api/reglas/combate` con `{tieneBalas, granadaLanzada}`. Responde HTTP 200 con `aceptada: true` o `false`, y el cliente distingue el rechazo por ese campo.
 
 ## 4. Modelo y persistencia
 
@@ -118,7 +119,7 @@ Las principales reglas de negocio se coordinan en la capa de servicios.
 - La recarga transfiere como máximo `min(espacio libre del cargador, reserva disponible)` y descuenta del jugador solamente lo transferido; si la reserva no alcanza para llenar el cargador, la recarga es parcial.
 - Un cargador lleno no puede recargarse.
 - La actualización mediante PUT conserva la munición actual, limitada por la nueva capacidad máxima.
-- En el escenario de POO-09 se consulta primero a A2 (disparo) y después a A3 (recarga), porque sin disparo válido no tiene sentido evaluar la recarga.
+- En el escenario de POO-09 se consulta primero a A2 (disparo) y después a A3 (munición y granada no reutilizada), porque sin disparo válido no tiene sentido evaluar el lanzamiento de la granada.
 - La jugada se persiste únicamente cuando los dos compañeros aceptan; un rechazo o una falta de respuesta dejan H2 exactamente igual.
 
 ### Cálculo de daño
@@ -227,7 +228,7 @@ Un rechazo de regla se devuelve con HTTP 400 y `aceptada: false` junto con un me
 
 | Método | Ruta | Propósito |
 |---|---|---|
-| POST | `/api/escenarios` | Ejecuta el escenario: A2 valida el disparo, A3 valida la recarga y se guarda la jugada si ambos aceptan. |
+| POST | `/api/escenarios` | Ejecuta el escenario: A2 valida el disparo, A3 valida munición y granada no reutilizada, y se guarda la jugada si ambos aceptan. El cuerpo admite `granadaLanzada` (opcional) para provocar el rechazo de A3. |
 | GET | `/api/escenarios` | Lista las jugadas aceptadas y persistidas. |
 | GET | `/api/escenarios/{id}` | Consulta una jugada por su identificador. |
 

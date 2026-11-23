@@ -9,6 +9,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Map;
 import java.util.Optional;
 
 import com.gio.cs2api.domain.Jugada;
@@ -23,6 +24,7 @@ import com.gio.cs2api.service.ValidadorCompanero.ResultadoValidacion;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -78,6 +80,27 @@ class EscenarioServiceTests {
     }
 
     @Test
+    void a3RecibeLosNombresDeCampoDeSuOpenAPI() {
+        when(a2.validar(anyMap())).thenReturn(
+                new ResultadoValidacion(true, "A2 ok", 15, null, 200));
+        when(a3.validar(anyMap())).thenReturn(
+                new ResultadoValidacion(true, "A3 ok", null, null, 200));
+        when(jugadaRepository.save(any(Jugada.class)))
+                .thenAnswer(invocacion -> invocacion.getArgument(0));
+
+        servicio.ejecutar(new SolicitudEscenario(1L, 2L, 50, true));
+
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<Map<String, Object>> captor =
+                ArgumentCaptor.forClass(Map.class);
+        verify(a3).validar(captor.capture());
+        Map<String, Object> enviado = captor.getValue();
+        assertEquals(2, enviado.size());
+        assertEquals(true, enviado.get("tieneBalas"));
+        assertEquals(true, enviado.get("granadaLanzada"));
+    }
+
+    @Test
     void rechazoDeA2NoEscribeEnLaBaseYNoLlamaAA3() {
         when(a2.rol()).thenReturn("A2");
         when(a2.regla()).thenReturn("regla de disparo");
@@ -99,7 +122,7 @@ class EscenarioServiceTests {
         when(a2.validar(anyMap())).thenReturn(
                 new ResultadoValidacion(true, "A2 ok", 15, null, 200));
         when(a3.rol()).thenReturn("A3");
-        when(a3.regla()).thenReturn("regla de recarga");
+        when(a3.regla()).thenReturn("regla de combate de A3");
         when(a3.validar(anyMap())).thenReturn(
                 new ResultadoValidacion(false, "Cargador lleno", null, 0, 400));
 
