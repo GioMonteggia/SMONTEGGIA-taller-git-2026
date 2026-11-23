@@ -251,7 +251,7 @@ Se revisó el documento de corrección de POO-08, que registró 18 de 24 puntos.
 - `Arma.actualizarDesde` conserva la munición al actualizar con PUT.
 - La documentación dejó de anunciar una consola inexistente, actualizó el enlace al commit final de POO-08, indicó que `GET /` ya está en la colección y corrigió la ortografía.
 
-Las mejoras optativas sobre `AccionCombate` en otra familia y sobre el merge en `main` no se aplicaron; el documento aclaraba que no restaban puntos.
+La mejora optativa sobre `AccionCombate` en otra familia no se aplicó; el documento aclaraba que no restaba puntos. La mejora optativa sobre el merge en `main` sí se aplicó al cierre de POO-09, con `main` incluyendo POO-08 y POO-09.
 
 ### 6.8. POO-09: APIs cruzadas
 

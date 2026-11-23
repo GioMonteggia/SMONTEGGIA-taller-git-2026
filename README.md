@@ -30,7 +30,7 @@ La corrección de POO-08 registró **18 de 24 puntos** y varias observaciones. P
 | 4. Herencia y sobrescritura (3/3) | Mejora optativa sobre implementar `AccionCombate` en otra familia. | No se aplicó: no restaba puntos. `GET /api/simulacion/acciones/{armaId}` sí usa la interfaz sobre un arma persistida. |
 | 5. Constructores y sobrecarga (3/3) | Sin observaciones. | Sin cambios necesarios. |
 | 6. Comportamiento observable (2,5/3) | Misma falla de `/h2-console`; las reglas debían vivir en servicios. | Consola verificada. El cálculo de daño y la recarga se coordinan en `SimulacionService`, y además se publican como reglas validables en `ReglasCombateService`. |
-| 7. Git (3/3) | Mejora optativa: mergear `poo-08-crud-h2` en `main`. | No se aplicó: no restaba puntos. El historial conserva los commits atómicos. |
+| 7. Git (3/3) | Mejora optativa: mergear `poo-08-crud-h2` en `main`. | Se aplicó al cierre de POO-09: `main` incluye POO-08 y POO-09 mediante `merge --ff-only`, sin reescribir los commits atómicos. |
 | 8. Documentación (0/3) | La documentación anunciaba una consola que fallaba; citaba el commit `dfc4981`; pedía crear a mano `GET /` aunque ya estaba en Insomnia; y tenía más de tres errores de ortografía. | Documentación alineada con el servicio, enlace actualizado al commit final de POO-08, `GET /` presente en la colección y texto corregido. |
 
 Verificación ejecutada para este cierre: `./mvnw.cmd test` terminó con `Tests run: 6, Failures: 0, Errors: 0, Skipped: 0` y `BUILD SUCCESS`. También se arrancó el servicio y se comprobaron `GET /`, el CRUD, las acciones por interfaz, el disparo, la recarga, los errores 400/404/409, Swagger UI y la consola H2.

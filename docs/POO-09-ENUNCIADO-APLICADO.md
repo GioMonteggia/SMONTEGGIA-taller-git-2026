@@ -20,7 +20,7 @@ La corrección recibida registró 18 de 24 con observaciones. Todas quedaron cer
 | PUT reiniciaba la munición | `Arma.actualizarDesde` conserva la munición actual. |
 | Documentación desactualizada | Se corrigió el enlace al commit final, la recarga parcial, el diagrama Mermaid y la ortografía. |
 
-Las dos mejoras optativas que el propio documento indicaba que no descontaban puntos (otra familia para `AccionCombate` y el merge en `main`) no se aplicaron.
+La mejora optativa de otra familia para `AccionCombate` no se aplicó; el documento aclaraba que no descontaba puntos. La otra mejora optativa, el merge en `main`, sí se aplicó al cierre: `main` incluye ahora POO-08 y POO-09.
 
 ---
 
