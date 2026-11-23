@@ -249,7 +249,7 @@ disparar()
 disparar(int distancia)
 ```
 
-Esto corresponde a **overloading**, porque el nombre del método es el mismo pero cambia la lista de parámetros.
+Esto corresponde a **overloading**, porque el nombre del método es el mismo, pero cambia la lista de parámetros.
 
 La diferencia entre ambos conceptos es:
 

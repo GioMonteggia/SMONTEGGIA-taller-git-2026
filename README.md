@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Este proyecto implementa una API REST con Java 21 y Spring Boot para administrar armas de Counter-Strike 2, persistir su estado en H2 y ejecutar simulaciones de combate. El proyecto demuestra encapsulamiento, herencia, polimorfismo, sobrecarga, sobreescritura, interfaces, excepciones de dominio, servicios y persistencia con Spring Data JPA.
+Este proyecto implementa una API REST con Java 21 y Spring Boot para administrar armas de Counter-Strike 2, persistir su estado en H2 y ejecutar simulaciones de combate. El proyecto demuestra encapsulamiento, herencia, polimorfismo, sobrecarga, sobrescritura, interfaces, excepciones de dominio, servicios y persistencia con Spring Data JPA.
 
 ## Tecnologías
 
@@ -27,7 +27,7 @@ La corrección de POO-08 registró **18 de 24 puntos** y varias observaciones. P
 | 1. Entrega y arranque (2,5/3) | `/h2-console` respondía 404 con Spring Boot 4.1.1. | Se incorporó el módulo `spring-boot-h2console` y el arranque registra `H2 console available at '/h2-console'`. Verificado con una solicitud HTTP al iniciar el servicio. |
 | 2. Organización en paquetes (1/3) | `ArmaCrudController` y `SimulacionController` usaban repositorios directamente; el dominio lanzaba excepciones. | Existen `ArmaService` y `JugadorService`; los controladores delegan en servicios. Las validaciones y excepciones están en la capa de servicios. El paquete `domain` no contiene `throw new`. |
 | 3. Ocultamiento e invariantes (3/3) | Mejora optativa: un PUT restauraba la munición al máximo. | `Arma.actualizarDesde` conserva la munición actual y la limita al nuevo `municionMax`. El comportamiento está documentado más abajo. |
-| 4. Herencia y sobreescritura (3/3) | Mejora optativa sobre implementar `AccionCombate` en otra familia. | No se aplicó: no restaba puntos. `GET /api/simulacion/acciones/{armaId}` sí usa la interfaz sobre un arma persistida. |
+| 4. Herencia y sobrescritura (3/3) | Mejora optativa sobre implementar `AccionCombate` en otra familia. | No se aplicó: no restaba puntos. `GET /api/simulacion/acciones/{armaId}` sí usa la interfaz sobre un arma persistida. |
 | 5. Constructores y sobrecarga (3/3) | Sin observaciones. | Sin cambios necesarios. |
 | 6. Comportamiento observable (2,5/3) | Misma falla de `/h2-console`; las reglas debían vivir en servicios. | Consola verificada. El cálculo de daño y la recarga se coordinan en `SimulacionService`, y además se publican como reglas validables en `ReglasCombateService`. |
 | 7. Git (3/3) | Mejora optativa: mergear `poo-08-crud-h2` en `main`. | No se aplicó: no restaba puntos. El historial conserva los commits atómicos. |
@@ -66,7 +66,7 @@ Con un rifle y un jugador persistidos en A1, `POST /api/escenarios` simula **un 
 
 ### Cliente y configuración
 
-`CompaneroRestClient` usa `RestClient` y `ObjectMapper`. Lee la respuesta por los nombres de campo del OpenAPI (`aceptada`, `mensaje`, `danoEfectivo`/`danioEfectivo`, `municionTransferida`/`balasTransferidas`); si el compañero no publica un booleano, infiere la aceptación del código HTTP (2xx) y lee el rechazo de `error`. No importa clases del proyecto ajeno. Las URLs se configuran en `application.properties` y se pueden sobreescribir con variables de entorno:
+`CompaneroRestClient` usa `RestClient` y `ObjectMapper`. Lee la respuesta por los nombres de campo del OpenAPI (`aceptada`, `mensaje`, `danoEfectivo`/`danioEfectivo`, `municionTransferida`/`balasTransferidas`); si el compañero no publica un booleano, infiere la aceptación del código HTTP (2xx) y lee el rechazo de `error`. No importa clases del proyecto ajeno. Las URLs se configuran en `application.properties` y se pueden sobrescribir con variables de entorno:
 
 | Propiedad | Variable de entorno | Valor por defecto (prueba local) |
 |---|---|---|
@@ -77,7 +77,7 @@ Con un rifle y un jugador persistidos en A1, `POST /api/escenarios` simula **un 
 | `companeros.a3.validar-path` | `COMPANEROS_A3_VALIDAR_PATH` | `/api/reglas/combate` |
 | `companeros.a3.openapi-url` | `COMPANEROS_A3_OPENAPI_URL` | `http://localhost:8080/v3/api-docs` |
 
-Los dos clientes apuntan a los servicios reales: A2 a `8082` y A3 a `8080`. Todo se puede sobreescribir con las variables de entorno.
+Los dos clientes apuntan a los servicios reales: A2 a `8082` y A3 a `8080`. Todo se puede sobrescribir con las variables de entorno.
 
 ### Errores y atribución
 
@@ -341,7 +341,7 @@ El proyecto incluye el módulo `spring-boot-h2console` necesario para habilitar 
 
 El directorio `data/` está excluido de Git mediante `.gitignore`, porque contiene los archivos de la base de datos local.
 
-## Sobrecarga y sobreescritura
+## Sobrecarga y sobrescritura
 
 ### Sobrecarga (overloading)
 
@@ -355,7 +355,7 @@ Tanto `Rifle` como `Pistola` tienen los métodos `disparar()` y `disparar(int di
 
 Los constructores sin argumentos de las entidades persistidas tienen visibilidad `protected` para permitir que JPA reconstruya las entidades sin ofrecerlos como constructores normales de negocio.
 
-### Sobreescritura (overriding)
+### Sobrescritura (overriding)
 
 La clase abstracta `Arma` declara el método abstracto `disparar()`. `Rifle` y `Pistola` implementan ese método con la misma firma y utilizan `@Override`.
 
