@@ -1,4 +1,3 @@
-
 package com.gio.cs2api.service;
 
 import com.gio.cs2api.domain.AccionCombate;
@@ -113,7 +112,9 @@ public class SimulacionService {
     }
 
     private int calcularDanioEfectivo(Rifle rifle, int distancia) {
-        float factor = Math.max(0.5f, 1f - distancia / 100f);
+        float factor = Math.max(
+                0.5f,
+                1f - distancia / 100f);
 
         return Math.round(
                 rifle.getDano() * factor * rifle.getPrecision());
@@ -140,28 +141,39 @@ public class SimulacionService {
                     "El cargador ya está lleno");
         }
 
-        if (jugador.getMunicionReserva() < cantidadNecesaria) {
+        int reservaDisponible = jugador.getMunicionReserva();
+
+        if (reservaDisponible <= 0) {
             throw new MunicionAgotadaException(
-                    "El jugador no tiene suficiente munición de reserva");
+                    "El jugador no tiene munición de reserva");
         }
 
-        int reservaRestante =
-                jugador.getMunicionReserva() - cantidadNecesaria;
+        // Transfiere todas las balas disponibles hasta llenar el cargador.
+        int cantidadATransferir = Math.min(
+                cantidadNecesaria,
+                reservaDisponible);
+
+        // Actualiza la munición del arma mediante la recarga parcial.
+        int cantidadRecargada = arma.recargar(cantidadATransferir);
+
+        // Descuenta solamente las balas realmente transferidas.
+        int reservaRestante = reservaDisponible - cantidadRecargada;
 
         jugador.actualizarEstadoCombate(
                 jugador.getVida(),
                 reservaRestante);
 
-        AccionCombate accion = arma;
-        String resultado = accion.recargar();
-
         armaRepository.save(arma);
         jugadorRepository.save(jugador);
 
         Map<String, Object> respuesta = new LinkedHashMap<>();
-        respuesta.put("mensaje", resultado);
+        respuesta.put(
+                "mensaje",
+                arma.getNombre() + " recargada con "
+                        + cantidadRecargada + " balas.");
         respuesta.put("armaId", arma.getId());
         respuesta.put("municionActual", arma.getMunicionActual());
+        respuesta.put("municionTransferida", cantidadRecargada);
         respuesta.put("jugadorId", jugador.getId());
         respuesta.put("municionReserva", jugador.getMunicionReserva());
 

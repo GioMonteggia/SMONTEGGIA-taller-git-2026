@@ -1,4 +1,3 @@
-
 package com.gio.cs2api.domain;
 
 import jakarta.persistence.Column;
@@ -58,9 +57,33 @@ public abstract class Arma implements AccionCombate {
 
     public abstract String disparar();
 
+    /**
+     * Recarga el cargador completo.
+     * Se conserva para mantener el contrato de AccionCombate.
+     */
     public String recargar() {
         municionActual = municionMax;
         return nombre + " recargada.";
+    }
+
+    /**
+     * Recarga utilizando únicamente la cantidad de munición disponible.
+     *
+     * @param cantidadDisponible cantidad de balas disponibles para transferir
+     * @return cantidad de balas realmente transferidas al cargador
+     */
+    public int recargar(int cantidadDisponible) {
+        int espacioDisponible = Math.max(
+                0,
+                municionMax - municionActual);
+
+        int cantidadTransferida = Math.min(
+                Math.max(0, cantidadDisponible),
+                espacioDisponible);
+
+        municionActual += cantidadTransferida;
+
+        return cantidadTransferida;
     }
 
     public String describirAcciones() {
@@ -120,6 +143,6 @@ public abstract class Arma implements AccionCombate {
     }
 
     protected void consumirMunicion() {
-    municionActual--;
+        municionActual--;
     }
 }
