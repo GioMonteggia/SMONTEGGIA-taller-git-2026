@@ -128,7 +128,7 @@ Esto se ejecutó con `Tests run: 19, Failures: 0, Errors: 0` y con solicitudes H
 
 Importar `insomnia/POO-09-APIS-CRUZADAS.json`. El entorno trae `a1_base_url`, `a2_base_url`, `a3_base_url` y los IDs a reemplazar. Orden: consultar los tres OpenAPI; crear jugador y rifles; dejar 29/30 el rifle del camino feliz; ejecutar el escenario feliz; listar jugadas; ejecutar los dos rechazos y volver a listar para comprobar que el H2 quedó igual. La colección incluye respuestas de ejemplo para el feliz, el rechazo de A2 y el de A3.
 
-Enlace al commit de la solución: https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026/commit/4c979a73f01bfd200389d7005a3c683c95c66a2e
+Enlace al commit de la solución: https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026/commit/7744e2738e7f741b28761638c2f4a928c4746e6a
 
 ## Modelo y persistencia
 
@@ -590,6 +590,6 @@ El proyecto incluye el archivo `LICENSE` con la licencia Apache 2.0.
 
 POO-08 (observaciones cerradas): https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026/commit/920291e5c8bfe7bfc79db51389eb4c066e94fae8
 
-POO-09 (solución completa: OpenAPI, clientes, escenario y documentación): https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026/commit/4c979a73f01bfd200389d7005a3c683c95c66a2e
+POO-09 (solución completa: OpenAPI, clientes, escenario y documentación): https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026/commit/7744e2738e7f741b28761638c2f4a928c4746e6a
 
 Repositorio: https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026
