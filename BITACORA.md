@@ -252,13 +252,34 @@ Se revisó el documento de corrección de POO-08, que registró 18 de 24 puntos.
 
 Las mejoras optativas sobre `AccionCombate` en otra familia y sobre el merge en `main` no se aplicaron; el documento aclaraba que no restaban puntos.
 
+### 6.8. POO-09: APIs cruzadas
+
+Se verificaron los tres enlaces de la consigna (enunciado, grupos y ejemplo UNO). Las vistas `blob` devolvieron 503, por lo que se confirmó el estado con `HEAD` (HTTP 200) y se leyó el contenido desde las URLs `raw.githubusercontent.com` equivalentes. La consigna aclara que el challenge es individual y que la nota de la corrección de POO-08 se contabiliza aparte dentro de los 15 puntos.
+
+Con apoyo de IA se realizaron las siguientes tareas independientes, que no dependen de los compañeros:
+
+- Se publicó el OpenAPI propio en `/v3/api-docs` y se documentaron con `@Tag`, `@Operation`, ejemplos y respuestas de error el CRUD, la simulación, las reglas y el escenario.
+- Se extrajeron las reglas propias a `ReglasCombateService` y se publicaron en `/api/reglas/disparo` y `/api/reglas/recarga`, con `aceptada`, `mensaje` y los valores calculados. Un rechazo responde HTTP 400.
+- Se implementó `CompaneroRestClient` con `RestClient` y un `ObjectMapper`, sin importar clases de los proyectos ajenos. Lee las respuestas por los nombres de campo del OpenAPI y distingue rechazo (409) de falta de respuesta (502).
+- Se hicieron configurables la URL base, la ruta de validación y la URL del OpenAPI de A2 y A3 mediante propiedades y variables de entorno.
+- Se creó la entidad `Jugada` y el servicio `EscenarioService`: consulta A2 y después A3, y guarda en H2 recién después de las dos aceptaciones. Los rechazos no dejan rastro en la base.
+- Se agregó la colección `insomnia/POO-09-APIS-CRUZADAS.json` con los tres OpenAPI, la preparación de datos, el camino feliz y los rechazos por A2 y por A3, con respuestas de ejemplo.
+
+Las pruebas automatizadas pasaron de 6 a 19 (`Failures: 0, Errors: 0`). También se verificaron solicitudes HTTP reales: el camino feliz guardó una jugada (`0 → 1`) y los dos rechazos devolvieron 409 con `rechazadoPor` sin cambiar el conteo (`1 → 1 → 1`).
+
+Los nombres, repositorios, URLs y reglas de A2 y A3 todavía no fueron confirmados. Por ese motivo el mapa A1/A2/A3 y el archivo con el enunciado aplicado conservan celdas `PENDIENTE`, y los valores por defecto apuntan a este mismo servicio para permitir la verificación local. Esa verificación no sustituye el round robin real y debe actualizarse en la etapa de colaboración.
+
 ## 7. Referencia al código publicado
 
-El siguiente commit identifica la implementación de los cambios de código y servicios de POO-08:
+POO-08 (código y servicios):
 
 https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026/commit/5861daf
 
-Este enlace se utiliza como referencia al commit de implementación. El enlace de entrega definitiva debe apuntar al commit publicado que incluya la versión final del código y de la documentación.
+POO-08 (cierre de observaciones de la corrección):
+
+https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026/commit/920291e5c8bfe7bfc79db51389eb4c066e94fae8
+
+POO-09 se implementó en tres commits separados sobre la rama `poo-09-apis-cruzadas`: `d692ce7` (OpenAPI y reglas), `fed4984` (clientes hacia A2 y A3) y `d2370df` (escenario persistido). El enlace de entrega definitiva se registra en `README.md` y apunta al commit publicado que incluye la versión final del código y de la documentación: ENLACE_COMMIT_SOLUCION.
 
 ## 8. Resultado final
 
@@ -270,4 +291,4 @@ En POO-08 se trabajó en la persistencia de armas y jugadores mediante Spring Da
 
 Durante el desarrollo se realizaron pruebas automatizadas y manuales. Los resultados registrados reflejan las ejecuciones realizadas en esos momentos y deben confirmarse nuevamente después de cualquier cambio posterior.
 
-Los cambios de implementación se publicaron en la rama `poo-08-crud-h2`. La entrega debe incluir la versión final del código y la documentación, con un enlace al commit definitivo publicado en GitHub.
+Los cambios de POO-08 se publicaron en la rama `poo-08-crud-h2` y los de POO-09 en la rama `poo-09-apis-cruzadas`. La entrega debe incluir la versión final del código y la documentación, con un enlace al commit definitivo publicado en GitHub.

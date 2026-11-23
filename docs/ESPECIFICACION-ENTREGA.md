@@ -1,10 +1,10 @@
-# Especificación de entrega: POO-08 CRUD H2 e Insomnia
+# Especificación de entrega: POO-08 CRUD H2, Insomnia y POO-09 APIs cruzadas
 
 ## 1. Objetivo
 
 Implementar una API REST de armas de Counter-Strike 2 con Java 21 y Spring Boot, persistencia en H2, operaciones CRUD, validaciones en la capa de servicios, una interfaz de comportamiento, excepciones específicas y una simulación persistida de combate.
 
-Esta especificación documenta el modelo, la arquitectura, las reglas de negocio, los endpoints y las verificaciones realizadas durante el desarrollo de POO-08.
+Esta especificación documenta el modelo, la arquitectura, las reglas de negocio, los endpoints y las verificaciones realizadas durante POO-08 y POO-09. En POO-09 se agregaron un documento OpenAPI propio, clientes HTTP hacia dos compañeros y un escenario persistido en H2.
 
 ## 2. Tecnologías
 
@@ -30,7 +30,13 @@ Esta especificación documenta el modelo, la arquitectura, las reglas de negocio
 - Recarga: `/api/simulacion/recargar`
 - Recarga mediante `AccionCombate`: `/api/simulacion/acciones/{armaId}/recargar`
 - Consola H2: `http://localhost:8080/h2-console`
-- Colección de Insomnia: `insomnia/CS2-API-2026.json`
+- Documento OpenAPI de A1: `http://localhost:8080/v3/api-docs`
+- Swagger UI de A1: `http://localhost:8080/swagger-ui.html`
+- Regla de disparo publicada: `POST /api/reglas/disparo`
+- Regla de recarga publicada: `POST /api/reglas/recarga`
+- Escenario con A2 y A3: `POST /api/escenarios`
+- Colección de Insomnia de POO-08: `insomnia/CS2-API-2026.json`
+- Colección de Insomnia de POO-09: `insomnia/POO-09-APIS-CRUZADAS.json`
 - Repositorio: https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026
 
 ## 4. Modelo y persistencia
@@ -45,6 +51,8 @@ El inventario de demostración de `Jugador` está marcado con `@Transient`, por 
 
 Los identificadores son generados por JPA y se utilizan para consultar, actualizar y eliminar los recursos persistidos.
 
+La clase `Jugada` es la entidad agregada en POO-09. Guarda la descripción del escenario aceptado, los identificadores del rifle y del jugador, la distancia, el daño efectivo, la munición transferida, la aceptación de A2 y de A3, los mensajes de cada compañero y la fecha de registro. Se escribe en H2 únicamente cuando los dos compañeros aceptan.
+
 ## 5. Organización por capas
 
 El proyecto separa las responsabilidades de los controladores REST, los servicios y los repositorios.
@@ -57,12 +65,19 @@ El proyecto separa las responsabilidades de los controladores REST, los servicio
 - `JugadorController`: expone operaciones de demostración sobre jugadores e inventarios.
 - `ArmaCrudController`: recibe las solicitudes HTTP del CRUD persistente y delega en `ArmaService`.
 - `SimulacionController`: delega las operaciones de combate en `SimulacionService` y las operaciones de jugadores en `JugadorService`.
+- `ReglasCombateController`: publica las dos reglas de A1 (`/api/reglas/disparo` y `/api/reglas/recarga`) para que otros servicios las consulten desde el OpenAPI.
+- `EscenarioController`: expone `POST /api/escenarios` y las consultas de jugadas; es el único endpoint que debe invocar el cliente.
 
 ### Servicios
 
 - `ArmaService`: valida los datos y coordina la creación, consulta, actualización y eliminación de armas mediante `ArmaRepository`.
 - `JugadorService`: valida, crea y consulta jugadores mediante `JugadorRepository`.
 - `SimulacionService`: coordina los disparos y las recargas, verifica las condiciones de la simulación y persiste los cambios del arma y del jugador.
+- `ReglasCombateService`: valida el disparo y la recarga parcial y publica los resultados con un mensaje y un indicador `aceptada`.
+- `EscenarioService`: consulta a A2 y a A3 en ese orden, construye la jugada y la guarda en `JugadaRepository` sólo si ambos aceptan.
+- `ValidadorCompanero`: interfaz que desacopla el escenario del cliente HTTP.
+- `CompaneroRestClient`: implementación con `RestClient`; lee las respuestas por los nombres de campo del OpenAPI ajeno, sin importar clases del compañero.
+- `CompanerosConfig`: crea los beans `A2` y `A3` con los nombres de regla y las URLs configuradas.
 - `ArmaDemostracionService`: coordina la creación y las acciones de armas de demostración.
 - `RifleDemostracionService`: organiza las simulaciones de disparo de rifles de demostración.
 - `JugadorDemostracionService`: coordina las demostraciones de jugadores.
@@ -73,6 +88,9 @@ El proyecto separa las responsabilidades de los controladores REST, los servicio
 
 - `ArmaRepository`: interfaz de persistencia de armas.
 - `JugadorRepository`: interfaz de persistencia de jugadores.
+- `JugadaRepository`: interfaz de persistencia de las jugadas aceptadas en el escenario.
+- `RechazoCompaneroException`: representa un rechazo de A2 o de A3; se traduce en HTTP 409 e identifica al compañero, la regla, el mensaje y el código HTTP recibido.
+- `CompaneroNoDisponibleException`: representa la falta de respuesta de un compañero; se traduce en HTTP 502.
 - `ApiExceptionHandler`: traduce las excepciones a respuestas HTTP mediante `@RestControllerAdvice`.
 - `ExcepcionDominioCS2`: clase base de las excepciones de dominio.
 - `ArmaNoEncontradaException`: representa la búsqueda de un arma inexistente.
@@ -96,9 +114,11 @@ Las principales reglas de negocio se coordinan en la capa de servicios.
 - Un disparo válido consume una bala.
 - El daño efectivo del rifle depende del daño base, la distancia y la precisión.
 - Un arma sin munición no puede completar un disparo.
-- La recarga utiliza la reserva del jugador y actualiza el estado del arma y del jugador.
+- La recarga transfiere como máximo `min(espacio libre del cargador, reserva disponible)` y descuenta del jugador solamente lo transferido; si la reserva no alcanza para llenar el cargador, la recarga es parcial.
 - Un cargador lleno no puede recargarse.
 - La actualización mediante PUT conserva la munición actual, limitada por la nueva capacidad máxima.
+- En el escenario de POO-09 se consulta primero a A2 (disparo) y después a A3 (recarga), porque sin disparo válido no tiene sentido evaluar la recarga.
+- La jugada se persiste únicamente cuando los dos compañeros aceptan; un rechazo o una falta de respuesta dejan H2 exactamente igual.
 
 ### Cálculo de daño
 
@@ -193,6 +213,35 @@ Estos endpoints didácticos trabajan con objetos de demostración y no deben con
 
 En `/armas/{tipo}`, el servicio de demostración admite tipos como `rifle`, `pistola`, `escopeta`, `subfusil`, `francotirador`, `humo`, `flash`, `incendiaria` y `senuelo`.
 
+### 7.4. Reglas publicadas por A1
+
+| Método | Ruta | Propósito |
+|---|---|---|
+| POST | `/api/reglas/disparo` | Valida munición, daño base, precisión y distancia; devuelve `aceptada`, `mensaje` y `danoEfectivo`. |
+| POST | `/api/reglas/recarga` | Valida cargador y reserva; devuelve `aceptada`, `mensaje` y `municionTransferida`. |
+
+Un rechazo de regla se devuelve con HTTP 400 y `aceptada: false` junto con un mensaje. Ambas operaciones están documentadas con ejemplos en `/v3/api-docs`.
+
+### 7.5. Escenario con las dos APIs ajenas
+
+| Método | Ruta | Propósito |
+|---|---|---|
+| POST | `/api/escenarios` | Ejecuta el escenario: A2 valida el disparo, A3 valida la recarga y se guarda la jugada si ambos aceptan. |
+| GET | `/api/escenarios` | Lista las jugadas aceptadas y persistidas. |
+| GET | `/api/escenarios/{id}` | Consulta una jugada por su identificador. |
+
+Cuerpo de la solicitud:
+
+```json
+{
+  "rifleId": 1,
+  "jugadorId": 1,
+  "distancia": 50
+}
+```
+
+Respuesta correcta: HTTP 201 con la jugada persistida. Si un compañero rechaza, HTTP 409 con `rechazadoPor` (`"A2"` o `"A3"`), `regla`, `mensajeCompanero` y `codigoHttpCompanero`. Si no responde, HTTP 502 con `rechazadoPor` y `motivo: "sin respuesta"`.
+
 ## 8. Herencia, sobrecarga e interfaz
 
 `Arma` es una clase abstracta y declara el método abstracto `disparar()`. `Rifle` y `Pistola` implementan ese método con el comportamiento específico de cada subtipo.
@@ -210,7 +259,7 @@ La jerarquía de excepciones contiene una clase base, `ExcepcionDominioCS2`, y d
 - `ArmaNoEncontradaException`: representa un arma inexistente y se traduce en HTTP 404.
 - `MunicionAgotadaException`: representa un disparo rechazado por falta de munición y se traduce en HTTP 409.
 
-`ApiExceptionHandler` centraliza la traducción de excepciones a respuestas HTTP mediante `@RestControllerAdvice`. Las respuestas de error incluyen un objeto JSON con la clave `error` y un mensaje descriptivo.
+`ApiExceptionHandler` centraliza la traducción de excepciones a respuestas HTTP mediante `@RestControllerAdvice`. Las respuestas de error incluyen un objeto JSON con la clave `error` y un mensaje descriptivo. En el escenario, los errores de compañero agrupan `error`, `rechazadoPor`, `regla`, `mensajeCompanero` y `codigoHttpCompanero` (o `motivo` cuando no hubo respuesta).
 
 | Código HTTP | Significado |
 |---|---|
@@ -219,7 +268,8 @@ La jerarquía de excepciones contiene una clase base, `ExcepcionDominioCS2`, y d
 | `204 No Content` | Recurso eliminado sin cuerpo de respuesta. |
 | `400 Bad Request` | Datos inválidos o cargador lleno. |
 | `404 Not Found` | Arma inexistente. |
-| `409 Conflict` | Disparo rechazado por falta de munición. |
+| `409 Conflict` | Disparo rechazado por falta de munición o escenario rechazado por A2/A3. |
+| `502 Bad Gateway` | A2 o A3 no respondió durante el escenario. |
 
 ## 10. Configuración de H2
 
@@ -266,7 +316,7 @@ La API queda disponible en `http://localhost:8080`.
 
 ## 12. Verificación con Insomnia
 
-La colección versionada se encuentra en `insomnia/CS2-API-2026.json`.
+La colección de POO-08 se encuentra en `insomnia/CS2-API-2026.json`. La colección de POO-09 se encuentra en `insomnia/POO-09-APIS-CRUZADAS.json` y debe importarse para verificar el escenario.
 
 Para utilizarla:
 
@@ -278,6 +328,8 @@ Para utilizarla:
 La colección incluye una solicitud `GET /` que comprueba que el servicio responde:
 
 `API de armas de Counter-Strike 2 funcionando`
+
+Para la colección de POO-09, el entorno define `a1_base_url`, `a2_base_url` y `a3_base_url`. El orden de pruebas es: consultar los tres OpenAPI, crear jugador y rifles, preparar el rifle en 29/30, ejecutar el escenario feliz, listar jugadas, ejecutar el rechazo de A2 y el de A3, y volver a listar para comprobar que la cantidad de jugadas no cambió.
 
 ### Orden de pruebas
 
@@ -310,12 +362,21 @@ Durante el desarrollo se registraron los siguientes resultados en Insomnia:
 - Consulta de acciones mediante `AccionCombate`: HTTP 200.
 - Disparo a 50 metros con daño base 36 y precisión 0,85: daño efectivo de 15 puntos.
 - Consumo de una bala durante un disparo válido: comprobado.
-- Recarga correcta: HTTP 200, cargador restaurado y reserva reducida.
+- Recarga correcta: HTTP 200, cargador aumentado y reserva reducida solamente por lo transferido.
 - Recarga con el cargador lleno: HTTP 400.
 - Disparo con un rifle de prueba sin munición: HTTP 409.
 - Consulta del jugador persistido: HTTP 200.
 - Persistencia del jugador después de reiniciar Spring Boot: comprobada.
 - Eliminación de un arma de prueba: HTTP 204.
+
+Resultados adicionales de POO-09:
+
+- `/v3/api-docs` y `/swagger-ui.html`: HTTP 200, con las rutas `/api/reglas/*` y `/api/escenarios` documentadas.
+- Escenario con A2 y A3 apuntando al propio servicio: HTTP 201, `danoEfectivo: 15`, `municionTransferida: 1` y una jugada nueva en `GET /api/escenarios`.
+- Rechazo de A2 (rifle sin munición): HTTP 409 con `rechazadoPor: "A2"`; A3 no se consulta y la cantidad de jugadas no cambia.
+- Rechazo de A3 (cargador lleno): HTTP 409 con `rechazadoPor: "A3"`; la cantidad de jugadas no cambia.
+- Conteo de jugadas observado: `0 → 1 → 1 → 1`.
+- Pruebas automatizadas: `Tests run: 19, Failures: 0, Errors: 0, Skipped: 0`.
 
 Las pruebas automatizadas ejecutadas anteriormente finalizaron con `BUILD SUCCESS`, sin fallos ni errores. Para volver a comprobarlas, se puede ejecutar `.\mvnw.cmd test` desde Windows PowerShell.
 
@@ -325,10 +386,14 @@ Repositorio:
 
 https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026
 
-Rama de trabajo:
+Ramas de trabajo:
 
-`poo-08-crud-h2`
+`poo-08-crud-h2` y `poo-09-apis-cruzadas`
 
 Commit final publicado de POO-08:
 
 https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026/commit/920291e5c8bfe7bfc79db51389eb4c066e94fae8
+
+Commit de la solución de POO-09:
+
+ENLACE_COMMIT_SOLUCION

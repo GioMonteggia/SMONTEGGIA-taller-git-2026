@@ -35,6 +35,100 @@ La corrección de POO-08 registró **18 de 24 puntos** y varias observaciones. P
 
 Verificación ejecutada para este cierre: `./mvnw.cmd test` terminó con `Tests run: 6, Failures: 0, Errors: 0, Skipped: 0` y `BUILD SUCCESS`. También se arrancó el servicio y se comprobaron `GET /`, el CRUD, las acciones por interfaz, el disparo, la recarga, los errores 400/404/409, Swagger UI y la consola H2.
 
+## POO-09 — Challenge de APIs cruzadas
+
+Enunciado verificado: [consigna](https://github.com/alefq/afq-taller-git-2024/blob/main/docs/ejercicio-poo-09-apis-cruzadas-2026-11-16.md), [grupos](https://github.com/alefq/afq-taller-git-2024/blob/main/docs/ejercicio-poo-09-grupos-2026-11-16.md) y [ejemplo UNO](https://github.com/alefq/afq-taller-git-2024/blob/main/docs/ejercicio-poo-09-ejemplo-uno-2026-11-16.md). Los tres enlaces responden HTTP 200; el texto se leyó desde las URLs `raw.githubusercontent.com` equivalentes.
+
+### OpenAPI propio
+
+| Documento | URL |
+|---|---|
+| Documento OpenAPI 3 de A1 | `http://localhost:8080/v3/api-docs` |
+| Swagger UI de A1 | `http://localhost:8080/swagger-ui.html` |
+
+El documento incluye el CRUD (`/api/armas`), la simulación (`/api/simulacion/**`), las dos reglas publicadas (`/api/reglas/disparo` y `/api/reglas/recarga`, con respuestas 200 y 400 y ejemplos) y el escenario (`/api/escenarios`, con respuestas 201, 409 y 502). Un compañero puede importarlo sin ver el código Java: no necesita las clases ni los repositorios de A1.
+
+### Mapa A1 / A2 / A3 y reglas citadas
+
+**Estado del grupo:** el challenge es individual y la nota es individual; el grupo sólo acuerda a quién se consulta. A2 y A3 son los dos compañeros de CS2 ya elegidos, pero sus nombres, repositorios y URLs **todavía no fueron confirmados**. Las celdas marcadas como `PENDIENTE` se completan en el paso de colaboración; el código y la colección ya aceptan esas URLs por configuración.
+
+| Rol | Estudiante / servicio | URL base | URL del OpenAPI | Regla que se consulta (en una frase) |
+|---|---|---|---|---|
+| A1 | Sergio Giovanni Monteggia Ortega (este repositorio) | `http://localhost:8080` | `http://localhost:8080/v3/api-docs` | Disparo: con munición, daño y precisión válidos, calcula el daño efectivo según la distancia. Recarga: si hay espacio y reserva, transfiere `min(espacio, reserva)`. |
+| A2 | Compañero 1 de CS2 — **PENDIENTE** | `PENDIENTE` | `PENDIENTE` | **PENDIENTE**: se citará en una frase desde su OpenAPI. |
+| A3 | Compañero 2 de CS2 — **PENDIENTE** | `PENDIENTE` | `PENDIENTE` | **PENDIENTE**: se citará en una frase desde su OpenAPI. |
+
+Por defecto este proyecto mapea A2 a la regla de disparo (`companeros.a2.validar-path=/api/reglas/disparo`) y A3 a la de recarga (`companeros.a3.validar-path=/api/reglas/recarga`). Cuando se conozcan los OpenAPI ajenos se ajustan esas dos propiedades y las reglas citadas; no se copia código del compañero.
+
+### Escenario en una frase
+
+Con un rifle y un jugador persistidos en A1, `POST /api/escenarios` simula un disparo con recarga parcial: **A2 valida el disparo, A3 valida la recarga y A1 guarda la jugada en su H2 sólo si los dos aceptan**; un `GET /api/escenarios` la vuelve a mostrar.
+
+### Cliente y configuración
+
+`CompaneroRestClient` usa `RestClient` y `ObjectMapper`. Lee la respuesta del compañero por los nombres de campo del OpenAPI (`aceptada`, `mensaje`, `danoEfectivo`, `municionTransferida`) y no importa clases del proyecto ajeno. Las URLs se configuran en `application.properties` y se pueden sobreescribir con variables de entorno:
+
+| Propiedad | Variable de entorno | Valor por defecto (prueba local) |
+|---|---|---|
+| `companeros.a2.base-url` | `COMPANEROS_A2_BASE_URL` | `http://localhost:8080` |
+| `companeros.a2.validar-path` | `COMPANEROS_A2_VALIDAR_PATH` | `/api/reglas/disparo` |
+| `companeros.a2.openapi-url` | `COMPANEROS_A2_OPENAPI_URL` | `http://localhost:8080/v3/api-docs` |
+| `companeros.a3.base-url` | `COMPANEROS_A3_BASE_URL` | `http://localhost:8080` |
+| `companeros.a3.validar-path` | `COMPANEROS_A3_VALIDAR_PATH` | `/api/reglas/recarga` |
+| `companeros.a3.openapi-url` | `COMPANEROS_A3_OPENAPI_URL` | `http://localhost:8080/v3/api-docs` |
+
+Los valores por defecto apuntan a este mismo servicio para poder verificar el escenario sin los compañeros. En la entrega real se reemplazan por las URLs de A2 y A3.
+
+### Errores y atribución
+
+| Situación | Respuesta de A1 | Base de A1 |
+|---|---|---|
+| A2 y A3 aceptan | HTTP 201 con la jugada | Se inserta una fila en `jugadas_cs2` |
+| A2 rechaza | HTTP 409 con `rechazadoPor: "A2"`, mensaje y código del compañero | Sin cambios; A3 ni se consulta |
+| A3 rechaza | HTTP 409 con `rechazadoPor: "A3"` | Sin cambios |
+| Algún compañero no responde | HTTP 502 con `rechazadoPor` y `motivo: "sin respuesta"` | Sin cambios |
+
+El orden es A2 y después A3 porque sin un disparo válido no tiene sentido pedir la recarga. El `save` ocurre recién después de las dos respuestas favorables.
+
+### Cómo arrancar los tres servicios
+
+Cada servicio se clona y se arranca desde su propio repositorio con `./mvnw spring-boot:run`. En una misma máquina se usan puertos distintos:
+
+```powershell
+# Terminal 1 — A1 (este repositorio)
+$env:COMPANEROS_A2_BASE_URL="http://localhost:8081"
+$env:COMPANEROS_A3_BASE_URL="http://localhost:8082"
+.\mvnw.cmd spring-boot:run
+
+# Terminal 2 — A2 (repositorio del compañero 1)
+$env:SERVER_PORT=8081
+.\mvnw.cmd spring-boot:run
+
+# Terminal 3 — A3 (repositorio del compañero 2)
+$env:SERVER_PORT=8082
+.\mvnw.cmd spring-boot:run
+```
+
+Si los servicios están en otras máquinas, se reemplazan `localhost` por las IPs o nombres acordados. Cada clon tiene su propio H2 en `data/`.
+
+### Verificación local sin los compañeros
+
+Sin cambiar propiedades, A2 y A3 apuntan a `http://localhost:8080`, así que se puede probar todo con un solo servicio:
+
+1. Arrancar A1 y crear un jugador con `POST /api/simulacion/jugadores` (reserva 90).
+2. Crear un rifle de 30 balas con `POST /api/armas`, guardar su ID y disparar una vez para dejarlo en 29/30.
+3. `POST /api/escenarios` con ese rifle y ese jugador: HTTP 201, `danoEfectivo: 15`, `municionTransferida: 1` y una jugada nueva en `GET /api/escenarios`.
+4. Crear un rifle de 1 bala, agotarlo y repetir el escenario: HTTP 409 de **A2** y la misma cantidad de jugadas.
+5. Crear un rifle de 30/30 y repetir: HTTP 409 de **A3** y la misma cantidad de jugadas.
+
+Esto se ejecutó con `Tests run: 19, Failures: 0, Errors: 0` y con solicitudes HTTP reales; los conteos de jugadas fueron `0 → 1 → 1 → 1`.
+
+### Insomnia
+
+Importar `insomnia/POO-09-APIS-CRUZADAS.json`. El entorno trae `a1_base_url`, `a2_base_url`, `a3_base_url` y los IDs a reemplazar. Orden: consultar los tres OpenAPI; crear jugador y rifles; dejar 29/30 el rifle del camino feliz; ejecutar el escenario feliz; listar jugadas; ejecutar los dos rechazos y volver a listar para comprobar que el H2 quedó igual. La colección incluye respuestas de ejemplo para el feliz, el rechazo de A2 y el de A3.
+
+Enlace al commit de la solución: ENLACE_COMMIT_SOLUCION
+
 ## Modelo y persistencia
 
 La familia principal de armas persistidas está formada por `Arma`, una clase abstracta, y sus clases hijas `Rifle` y `Pistola`. Se utiliza la estrategia de herencia JPA `SINGLE_TABLE`: las entidades de esta familia se guardan en una tabla compartida y se distinguen mediante la columna discriminadora `tipo_arma`.
@@ -84,8 +178,8 @@ Por ejemplo, con un rifle de daño base 36, precisión 0,85 y distancia de 50 me
 
 - Si el cargador está lleno, la operación se rechaza con HTTP 400.
 - Si no queda munición en el arma al intentar disparar, la operación se rechaza con HTTP 409.
-- Si la reserva del jugador es insuficiente para completar una recarga, se rechaza la operación.
-- Una recarga correcta resta de la reserva la cantidad necesaria y restaura la munición del cargador.
+- Si hay reserva disponible pero no alcanza para llenar el cargador, la recarga es **parcial**: se transfiere `min(espacio disponible, reserva)` y sólo se descuenta lo realmente transferido.
+- Una recarga correcta aumenta la munición del cargador; sólo lo restaura por completo cuando la reserva alcanza para llenarlo.
 
 Estas comprobaciones y la coordinación de los cambios persistidos se encuentran en la capa de servicios. Los métodos del dominio realizan las modificaciones de estado que corresponden a las acciones solicitadas.
 
@@ -308,6 +402,7 @@ classDiagram
 
     class Jugador
     class Inventario
+    class Jugada
 
     class AccionCombate {
         <<interface>>
@@ -324,12 +419,18 @@ classDiagram
         <<interface>>
     }
 
+    class JugadaRepository {
+        <<interface>>
+    }
+
     class IndexController
     class ArmaController
     class RifleController
     class JugadorController
     class ArmaCrudController
     class SimulacionController
+    class ReglasCombateController
+    class EscenarioController
 
     class ArmaDemostracionService
     class RifleDemostracionService
@@ -339,6 +440,14 @@ classDiagram
     class ArmaService
     class JugadorService
     class SimulacionService
+    class ReglasCombateService
+    class EscenarioService
+
+    class ValidadorCompanero {
+        <<interface>>
+    }
+    class CompaneroRestClient
+    class CompanerosConfig
 
     class ApiExceptionHandler
     class ExcepcionDominioCS2
@@ -362,6 +471,7 @@ classDiagram
 
     ArmaRepository --> Arma : persiste
     JugadorRepository --> Jugador : persiste
+    JugadaRepository --> Jugada : persiste
 
     ArmaController --> ArmaDemostracionService : delega
     RifleController --> RifleDemostracionService : delega
@@ -370,6 +480,15 @@ classDiagram
 
     SimulacionController --> SimulacionService : delega
     SimulacionController --> JugadorService : delega
+    ReglasCombateController --> ReglasCombateService : delega
+    EscenarioController --> EscenarioService : delega
+
+    EscenarioService --> ArmaRepository : consulta
+    EscenarioService --> JugadorRepository : consulta
+    EscenarioService --> JugadaRepository : guarda jugada aceptada
+    EscenarioService ..> ValidadorCompanero : consulta A2 y A3
+    ValidadorCompanero <|.. CompaneroRestClient
+    CompanerosConfig ..> CompaneroRestClient : crea
 
     ArmaDemostracionService --> GranadaService : utiliza
     JugadorDemostracionService --> InventarioService : utiliza
@@ -466,10 +585,10 @@ Las propiedades están en `src/main/resources/application.properties`. El direct
 
 El proyecto incluye el archivo `LICENSE` con la licencia Apache 2.0.
 
-## Commit de implementación
+## Commits de implementación
 
-El siguiente enlace identifica el commit final publicado de POO-08, con el código, los servicios, las pruebas y las correcciones documentales:
+POO-08 (observaciones cerradas): https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026/commit/920291e5c8bfe7bfc79db51389eb4c066e94fae8
 
-https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026/commit/920291e5c8bfe7bfc79db51389eb4c066e94fae8
+POO-09 (solución completa: OpenAPI, clientes, escenario y documentación): ENLACE_COMMIT_SOLUCION
 
 Repositorio: https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026

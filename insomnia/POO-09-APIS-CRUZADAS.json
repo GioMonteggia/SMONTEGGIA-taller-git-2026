@@ -1,0 +1,448 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2026-11-23T00:25:00Z",
+  "__export_source": "POO-09 A1",
+  "resources": [
+    {
+      "_id": "wrk_poo09",
+      "_type": "workspace",
+      "parentId": null,
+      "name": "POO-09 - APIs cruzadas CS2 (A1)",
+      "created": 1795400000001,
+      "modified": 1795400000001,
+      "description": "Escenario propio de A1: dispara y recarga sólo si A2 y A3 aceptan."
+    },
+    {
+      "_id": "env_poo09",
+      "_type": "environment",
+      "parentId": "wrk_poo09",
+      "name": "Bases de A1, A2 y A3",
+      "created": 1795400000002,
+      "modified": 1795400000002,
+      "isPrivate": false,
+      "data": {
+        "a1_base_url": "http://localhost:8080",
+        "a2_base_url": "http://localhost:8080",
+        "a3_base_url": "http://localhost:8080",
+        "rifleId": "REEMPLAZAR_CON_ID",
+        "jugadorId": "REEMPLAZAR_CON_ID",
+        "rifleVacioId": "REEMPLAZAR_CON_ID",
+        "rifleLlenoId": "REEMPLAZAR_CON_ID"
+      },
+      "metaSortKey": 1
+    },
+    {
+      "_id": "fld_openapi",
+      "_type": "request_group",
+      "parentId": "wrk_poo09",
+      "name": "0 - OpenAPI (A1, A2 y A3)",
+      "created": 1795400000003,
+      "modified": 1795400000003,
+      "description": "",
+      "metaSortKey": -10,
+      "environment": {}
+    },
+    {
+      "_id": "fld_preparar",
+      "_type": "request_group",
+      "parentId": "wrk_poo09",
+      "name": "1 - Preparar datos en A1",
+      "created": 1795400000004,
+      "modified": 1795400000004,
+      "description": "",
+      "metaSortKey": -20,
+      "environment": {}
+    },
+    {
+      "_id": "fld_escenario",
+      "_type": "request_group",
+      "parentId": "wrk_poo09",
+      "name": "2 - Escenario feliz",
+      "created": 1795400000005,
+      "modified": 1795400000005,
+      "description": "",
+      "metaSortKey": -30,
+      "environment": {}
+    },
+    {
+      "_id": "fld_rechazos",
+      "_type": "request_group",
+      "parentId": "wrk_poo09",
+      "name": "3 - Rechazo por compañero",
+      "created": 1795400000006,
+      "modified": 1795400000006,
+      "description": "",
+      "metaSortKey": -40,
+      "environment": {}
+    },
+    {
+      "_id": "req_openapi_a1",
+      "_type": "request",
+      "parentId": "fld_openapi",
+      "name": "OpenAPI de A1 (propio)",
+      "created": 1795400000007,
+      "modified": 1795400000007,
+      "method": "GET",
+      "url": "{{ a1_base_url }}/v3/api-docs",
+      "description": "Documento que publica este servicio. También en /swagger-ui.html.",
+      "headers": [],
+      "body": {},
+      "authentication": {},
+      "metaSortKey": -100,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingEncodeUrl": true,
+      "settingDisableRenderRequestBody": false,
+      "settingFollowRedirects": "global",
+      "settingRebuildPath": true
+    },
+    {
+      "_id": "req_openapi_a2",
+      "_type": "request",
+      "parentId": "fld_openapi",
+      "name": "OpenAPI de A2",
+      "created": 1795400000008,
+      "modified": 1795400000008,
+      "method": "GET",
+      "url": "{{ a2_base_url }}/v3/api-docs",
+      "description": "Primer contacto con A2: leer su documento, no su código.",
+      "headers": [],
+      "body": {},
+      "authentication": {},
+      "metaSortKey": -90,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingEncodeUrl": true,
+      "settingDisableRenderRequestBody": false,
+      "settingFollowRedirects": "global",
+      "settingRebuildPath": true
+    },
+    {
+      "_id": "req_openapi_a3",
+      "_type": "request",
+      "parentId": "fld_openapi",
+      "name": "OpenAPI de A3",
+      "created": 1795400000009,
+      "modified": 1795400000009,
+      "method": "GET",
+      "url": "{{ a3_base_url }}/v3/api-docs",
+      "description": "Primer contacto con A3: leer su documento, no su código.",
+      "headers": [],
+      "body": {},
+      "authentication": {},
+      "metaSortKey": -80,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingEncodeUrl": true,
+      "settingDisableRenderRequestBody": false,
+      "settingFollowRedirects": "global",
+      "settingRebuildPath": true
+    },
+    {
+      "_id": "req_crear_jugador",
+      "_type": "request",
+      "parentId": "fld_preparar",
+      "name": "Crear jugador",
+      "created": 1795400000010,
+      "modified": 1795400000010,
+      "method": "POST",
+      "url": "{{ a1_base_url }}/api/simulacion/jugadores",
+      "description": "Guardar el id devuelto en la variable jugadorId.",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"nombre\": \"Jugador escenario\",\n  \"vida\": 100,\n  \"municionReserva\": 90\n}"
+      },
+      "authentication": {},
+      "metaSortKey": -200,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingEncodeUrl": true,
+      "settingDisableRenderRequestBody": false,
+      "settingFollowRedirects": "global",
+      "settingRebuildPath": true
+    },
+    {
+      "_id": "req_crear_rifle",
+      "_type": "request",
+      "parentId": "fld_preparar",
+      "name": "Crear rifle (30 balas)",
+      "created": 1795400000011,
+      "modified": 1795400000011,
+      "method": "POST",
+      "url": "{{ a1_base_url }}/api/armas",
+      "description": "Guardar el id en rifleId. Disparar una vez para dejar 29/30.",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"tipo\": \"rifle\",\n  \"nombre\": \"AK-47 ESCENARIO\",\n  \"precio\": 2700,\n  \"dano\": 36,\n  \"cargador\": 30\n}"
+      },
+      "authentication": {},
+      "metaSortKey": -190,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingEncodeUrl": true,
+      "settingDisableRenderRequestBody": false,
+      "settingFollowRedirects": "global",
+      "settingRebuildPath": true
+    },
+    {
+      "_id": "req_preparar_disparo",
+      "_type": "request",
+      "parentId": "fld_preparar",
+      "name": "Disparo previo (deja 29/30)",
+      "created": 1795400000012,
+      "modified": 1795400000012,
+      "method": "POST",
+      "url": "{{ a1_base_url }}/api/simulacion/disparar?rifleId={{ rifleId }}&jugadorId={{ jugadorId }}&distancia=50",
+      "description": "Necesario para que A3 acepte la recarga: el cargador no debe estar lleno.",
+      "headers": [],
+      "body": {},
+      "authentication": {},
+      "metaSortKey": -180,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingEncodeUrl": true,
+      "settingDisableRenderRequestBody": false,
+      "settingFollowRedirects": "global",
+      "settingRebuildPath": true
+    },
+    {
+      "_id": "req_crear_vacio",
+      "_type": "request",
+      "parentId": "fld_preparar",
+      "name": "Crear rifle vacío (1 bala)",
+      "created": 1795400000013,
+      "modified": 1795400000013,
+      "method": "POST",
+      "url": "{{ a1_base_url }}/api/armas",
+      "description": "Guardar el id en rifleVacioId.",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"tipo\": \"rifle\",\n  \"nombre\": \"AK-47 SIN MUNICION\",\n  \"precio\": 2700,\n  \"dano\": 36,\n  \"cargador\": 1\n}"
+      },
+      "authentication": {},
+      "metaSortKey": -170,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingEncodeUrl": true,
+      "settingDisableRenderRequestBody": false,
+      "settingFollowRedirects": "global",
+      "settingRebuildPath": true
+    },
+    {
+      "_id": "req_vaciar",
+      "_type": "request",
+      "parentId": "fld_preparar",
+      "name": "Agotar rifle vacío",
+      "created": 1795400000014,
+      "modified": 1795400000014,
+      "method": "POST",
+      "url": "{{ a1_base_url }}/api/simulacion/disparar?rifleId={{ rifleVacioId }}&jugadorId={{ jugadorId }}&distancia=50",
+      "description": "Deja 0/1 para provocar el rechazo de A2.",
+      "headers": [],
+      "body": {},
+      "authentication": {},
+      "metaSortKey": -160,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingEncodeUrl": true,
+      "settingDisableRenderRequestBody": false,
+      "settingFollowRedirects": "global",
+      "settingRebuildPath": true
+    },
+    {
+      "_id": "req_crear_lleno",
+      "_type": "request",
+      "parentId": "fld_preparar",
+      "name": "Crear rifle lleno (30/30)",
+      "created": 1795400000015,
+      "modified": 1795400000015,
+      "method": "POST",
+      "url": "{{ a1_base_url }}/api/armas",
+      "description": "Guardar el id en rifleLlenoId para provocar el rechazo de A3.",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"tipo\": \"rifle\",\n  \"nombre\": \"AK-47 LLENO\",\n  \"precio\": 2700,\n  \"dano\": 36,\n  \"cargador\": 30\n}"
+      },
+      "authentication": {},
+      "metaSortKey": -150,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingEncodeUrl": true,
+      "settingDisableRenderRequestBody": false,
+      "settingFollowRedirects": "global",
+      "settingRebuildPath": true
+    },
+    {
+      "_id": "req_escenario_feliz",
+      "_type": "request",
+      "parentId": "fld_escenario",
+      "name": "Escenario feliz (A2 y A3 aceptan)",
+      "created": 1795400000016,
+      "modified": 1795400000016,
+      "method": "POST",
+      "url": "{{ a1_base_url }}/api/escenarios",
+      "description": "Sólo se llama a A1. Devuelve 201 y la jugada queda en GET /api/escenarios.",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"rifleId\": \"{{ rifleId }}\",\n  \"jugadorId\": \"{{ jugadorId }}\",\n  \"distancia\": 50\n}"
+      },
+      "authentication": {},
+      "metaSortKey": -300,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingEncodeUrl": true,
+      "settingDisableRenderRequestBody": false,
+      "settingFollowRedirects": "global",
+      "settingRebuildPath": true
+    },
+    {
+      "_id": "req_listar_jugadas",
+      "_type": "request",
+      "parentId": "fld_escenario",
+      "name": "Ver jugadas guardadas en H2 de A1",
+      "created": 1795400000017,
+      "modified": 1795400000017,
+      "method": "GET",
+      "url": "{{ a1_base_url }}/api/escenarios",
+      "description": "Después del feliz debe aparecer una jugada; tras cada rechazo, la misma cantidad.",
+      "headers": [],
+      "body": {},
+      "authentication": {},
+      "metaSortKey": -290,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingEncodeUrl": true,
+      "settingDisableRenderRequestBody": false,
+      "settingFollowRedirects": "global",
+      "settingRebuildPath": true
+    },
+    {
+      "_id": "req_rechazo_a2",
+      "_type": "request",
+      "parentId": "fld_rechazos",
+      "name": "Rechazo de A2 (sin munición)",
+      "created": 1795400000018,
+      "modified": 1795400000018,
+      "method": "POST",
+      "url": "{{ a1_base_url }}/api/escenarios",
+      "description": "A2 rechaza primero; A3 no llega a consultarse. HTTP 409.",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"rifleId\": \"{{ rifleVacioId }}\",\n  \"jugadorId\": \"{{ jugadorId }}\",\n  \"distancia\": 50\n}"
+      },
+      "authentication": {},
+      "metaSortKey": -400,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingEncodeUrl": true,
+      "settingDisableRenderRequestBody": false,
+      "settingFollowRedirects": "global",
+      "settingRebuildPath": true
+    },
+    {
+      "_id": "req_rechazo_a3",
+      "_type": "request",
+      "parentId": "fld_rechazos",
+      "name": "Rechazo de A3 (cargador lleno)",
+      "created": 1795400000019,
+      "modified": 1795400000019,
+      "method": "POST",
+      "url": "{{ a1_base_url }}/api/escenarios",
+      "description": "A2 acepta y A3 rechaza. HTTP 409 y H2 sin cambios.",
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"rifleId\": \"{{ rifleLlenoId }}\",\n  \"jugadorId\": \"{{ jugadorId }}\",\n  \"distancia\": 50\n}"
+      },
+      "authentication": {},
+      "metaSortKey": -390,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingEncodeUrl": true,
+      "settingDisableRenderRequestBody": false,
+      "settingFollowRedirects": "global",
+      "settingRebuildPath": true
+    },
+    {
+      "_id": "res_feliz",
+      "_type": "response",
+      "parentId": "req_escenario_feliz",
+      "name": "Respuesta de ejemplo: feliz",
+      "created": 1795400000020,
+      "modified": 1795400000020,
+      "statusCode": 201,
+      "body": "{\n  \"descripcion\": \"AK-47 ESCENARIO dispara a 50 m y recarga con la reserva de Jugador escenario\",\n  \"rifleId\": 76,\n  \"jugadorId\": 68,\n  \"distancia\": 50,\n  \"danoEfectivo\": 15,\n  \"municionTransferida\": 1,\n  \"aceptadaPorA2\": true,\n  \"aceptadaPorA3\": true,\n  \"mensajeA2\": \"La regla acepta el disparo.\",\n  \"mensajeA3\": \"La regla acepta la recarga.\"\n}",
+      "contentType": "application/json",
+      "headers": [],
+      "elapsed": 12
+    },
+    {
+      "_id": "res_a2",
+      "_type": "response",
+      "parentId": "req_rechazo_a2",
+      "name": "Respuesta de ejemplo: rechazo de A2",
+      "created": 1795400000021,
+      "modified": 1795400000021,
+      "statusCode": 409,
+      "body": "{\n  \"error\": \"A2 rechazó el escenario: El rifle no tiene munición.\",\n  \"rechazadoPor\": \"A2\",\n  \"regla\": \"Validacion de disparo: danio efectivo segun distancia y precision\",\n  \"mensajeCompanero\": \"El rifle no tiene munición.\",\n  \"codigoHttpCompanero\": 400\n}",
+      "contentType": "application/json",
+      "headers": [],
+      "elapsed": 12
+    },
+    {
+      "_id": "res_a3",
+      "_type": "response",
+      "parentId": "req_rechazo_a3",
+      "name": "Respuesta de ejemplo: rechazo de A3",
+      "created": 1795400000022,
+      "modified": 1795400000022,
+      "statusCode": 409,
+      "body": "{\n  \"error\": \"A3 rechazó el escenario: El cargador ya está lleno.\",\n  \"rechazadoPor\": \"A3\",\n  \"regla\": \"Validacion de recarga: transferencia parcial desde la reserva\",\n  \"mensajeCompanero\": \"El cargador ya está lleno.\",\n  \"codigoHttpCompanero\": 400\n}",
+      "contentType": "application/json",
+      "headers": [],
+      "elapsed": 12
+    }
+  ]
+}
