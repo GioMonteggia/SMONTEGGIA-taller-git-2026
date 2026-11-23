@@ -723,7 +723,7 @@ La bitácora registra:
 - Participación del estudiante.
 - Evidencia de pruebas.
 
-La herramienta utilizada fue ChatGPT, de OpenAI, utilizando el modelo GPT-5.6 Luna.
+La herramienta principal fue ChatGPT, de OpenAI, utilizando el modelo GPT-5.6 Luna. Como herramienta adicional se utilizó OpenCode para la auditoría final y el cierre de la entrega POO-09.
 
 ### LICENSE
 

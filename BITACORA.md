@@ -7,6 +7,7 @@ Durante el desarrollo del proyecto se utilizó la siguiente herramienta:
 - **Asistente:** ChatGPT
 - **Proveedor:** OpenAI
 - **Modelo:** GPT-5.6 Luna
+- **Herramienta adicional:** OpenCode, utilizado como entorno de desarrollo asistido para la auditoría final y el cierre de la entrega POO-09.
 
 ## 2. Objetivo del uso de IA
 
@@ -273,6 +274,8 @@ Prueba inversa real: se levantó el repo de Luis en 8080 junto con A1 en 8081 y 
 
 Reverificación final con el commit `24921ac` de César (rama `poo09-apis-cruzadas`): `/v3/api-docs` y `/swagger-ui/index.html` de A2 responden 200 y su `POST /api/armas` sigue aceptando el arma de A1. El round robin completo volvió a dar 201 con `aceptadaPorA2` y `aceptadaPorA3` en `true` (jugada id 129, `danoEfectivo: 20`), con rechazos 409 por economía y por granada repetida y conteo `3 → 4 → 4 → 4`.
 
+La auditoría final del cierre se realizó con OpenCode como herramienta adicional: se revisaron los tres enunciados y los enlaces publicados, se corrigieron los datos desactualizados de la documentación (nombre del repositorio en los enlaces, conteos de pruebas, mensaje de rechazo de A2, notas sobre el OpenAPI de César y guía de arranque), se comprobó la ortografía de los documentos Markdown, se ejecutaron las 26 pruebas automatizadas y se publicaron los cambios en `main`. El uso de OpenCode no sustituyó la revisión manual: cada enlace y cada dato se comprobó contra el repositorio, los repositorios de los compañeros y las respuestas HTTP reales.
+
 ## 7. Referencia al código publicado
 
 POO-08 (código y servicios):
@@ -283,7 +286,7 @@ POO-08 (cierre de observaciones de la corrección):
 
 https://github.com/GioMonteggia/INICIALES-taller-git-2026/commit/920291e5c8bfe7bfc79db51389eb4c066e94fae8
 
-POO-09 se implementó en varios commits sobre la rama `poo-09-apis-cruzadas`: `d692ce7` (OpenAPI y reglas), `fed4984` (clientes hacia A2 y A3), `d2370df` (escenario persistido), `4c979a7` (entrega independiente), `5f91e60` (integración real de A3) y `7744e27` (integración real de A2 y round robin completo). El enlace de entrega definitiva se registra en `README.md` y apunta al commit publicado que incluye la versión final del código y de la documentación: https://github.com/GioMonteggia/INICIALES-taller-git-2026/commit/c28b52d620660958569c744e585879817a3c2492. Las correcciones finales de documentación de esta auditoría están en el tip de la rama.
+POO-09 se implementó en varios commits sobre la rama `poo-09-apis-cruzadas`: `d692ce7` (OpenAPI y reglas), `fed4984` (clientes hacia A2 y A3), `d2370df` (escenario persistido), `4c979a7` (entrega independiente), `5f91e60` (integración real de A3) y `7744e27` (integración real de A2 y round robin completo). El enlace de entrega definitiva se registra en `README.md` y apunta al commit publicado que incluye la versión final del código y de la documentación: https://github.com/GioMonteggia/INICIALES-taller-git-2026/commit/c28b52d620660958569c744e585879817a3c2492. Las correcciones finales de documentación de esta auditoría están en el tip de la rama y de `main`.
 
 ## 8. Resultado final
 
