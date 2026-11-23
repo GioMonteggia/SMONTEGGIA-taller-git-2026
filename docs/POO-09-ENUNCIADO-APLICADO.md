@@ -2,7 +2,7 @@
 
 Este documento aplica la [consigna de POO-09](https://github.com/alefq/afq-taller-git-2024/blob/main/docs/ejercicio-poo-09-apis-cruzadas-2026-11-16.md), la [guía de grupos](https://github.com/alefq/afq-taller-git-2024/blob/main/docs/ejercicio-poo-09-grupos-2026-11-16.md) y el [ejemplo UNO](https://github.com/alefq/afq-taller-git-2024/blob/main/docs/ejercicio-poo-09-ejemplo-uno-2026-11-16.md) a este repositorio. Los tres enlaces se verificaron con HTTP 200.
 
-**Enlace al commit de la solución:** https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026/commit/c28b52d620660958569c744e585879817a3c2492
+**Enlace al commit de la solución:** https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026/commit/c28b52d620660958569c744e585879817a3c2492 (commit de integración estable: un commit no puede autorreferenciarse. Las correcciones finales están en el tip de la rama y de `main`, que es el hash que se entrega en Classroom.)
 
 ---
 
@@ -106,7 +106,7 @@ Si están en otras máquinas, se reemplaza `localhost` por las IPs o nombres aco
 
 Importar `insomnia/POO-09-APIS-CRUZADAS.json` y seguir este orden:
 
-1. Consultar los OpenAPI de A1, A2 y A3 (`GET {{ ... }}/v3/api-docs`).
+1. Consultar los OpenAPI de A1, A2 y A3 (`GET {{ a1_base_url }}/v3/api-docs`, `GET {{ a2_base_url }}/v3/api-docs` y `GET {{ a3_base_url }}/v3/api-docs`).
 2. Crear un jugador con reserva 90 y guardar su ID en `jugadorId`.
 3. Crear un rifle de 30 balas, guardar su ID en `rifleId` y ejecutar el disparo previo para dejarlo en 29/30.
 4. Ejecutar el escenario feliz: `POST {{ a1_base_url }}/api/escenarios` con `{ "rifleId": "{{ rifleId }}", "jugadorId": "{{ jugadorId }}", "distancia": 50, "granadaLanzada": false }` → HTTP 201.

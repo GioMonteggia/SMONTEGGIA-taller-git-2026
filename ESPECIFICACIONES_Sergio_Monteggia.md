@@ -8,7 +8,7 @@
 **Repositorio:**  
 https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026
 
-**Commit de la solución:**  
+**Commit histórico de este documento (etapa POO-06):**  
 https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026/commit/8ed6cf8de1843b29ac3027299ba6ed70369bbe4d
 
 **Tecnologías:** Java 21, Spring Boot, Maven, Git, GitHub, JUnit 5  
@@ -615,10 +615,10 @@ Las pruebas verifican principalmente:
 - Efecto de la distancia sobre el daño.
 - Límite mínimo del daño a grandes distancias.
 
-Resultado actual:
+Resultado de la etapa POO-06 (histórico; el estado final de POO-09 registra 26 pruebas):
 
 ```text
-Tests run: 6, Failures: 0, Errors: 0, Skipped: 0
+Tests run: 6, Failures: 0, Errors: 0, Skipped: 0 (ejecución histórica de POO-06; el estado final es 26/26)
 BUILD SUCCESS
 ```
 
@@ -785,7 +785,7 @@ src/test/java/com/gio/cs2api/
 
 ---
 
-## 22. Commit de la solución
+## 22. Commit histórico de este documento
 
 El hash definitivo del commit de entrega se establecerá después de completar:
 
@@ -797,13 +797,9 @@ El hash definitivo del commit de entrega se establecerá después de completar:
 6. Verificación final de los endpoints.
 7. Commit definitivo de la solución.
 
-El enlace final será:
+El enlace de la entrega final se registra en `README.md` y en `docs/ESPECIFICACION-ENTREGA.md`. El hash que se entrega en Classroom es el del tip de la rama `poo-09-apis-cruzadas` y de `main`, que incluye las correcciones finales de POO-08 y POO-09.
 
-```text
-https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026/commit/8ed6cf8de1843b29ac3027299ba6ed70369bbe4d
-```
-
-El `HASH_FINAL` será reemplazado por el hash completo real del commit definitivo.
+El commit `8ed6cf8de1843b29ac3027299ba6ed70369bbe4d` citado más arriba corresponde a este documento histórico de POO-06, no a la entrega final.
 
 ---
 
@@ -833,8 +829,8 @@ El inventario trabaja con el tipo general `Arma`, permitiendo que un jugador ten
 Las pruebas automatizadas finalizan correctamente con:
 
 ```text
-Tests run: 6, Failures: 0, Errors: 0, Skipped: 0
+Tests run: 6, Failures: 0, Errors: 0, Skipped: 0 (ejecución histórica de POO-06; el estado final es 26/26)
 BUILD SUCCESS
 ```
 
-La documentación del proyecto se mantiene alineada con la estructura y el comportamiento actual de `src/`.
+Esta documentación describe la etapa inicial; la documentación vigente es `README.md` y `docs/ESPECIFICACION-ENTREGA.md`.

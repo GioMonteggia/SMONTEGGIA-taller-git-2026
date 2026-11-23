@@ -12,7 +12,7 @@
                       },
                       {
                           "data":  {
-                                       "base_url":  "http://localhost:8080",
+                                       "base_url":  "http://localhost:8081",
                                        "rifleVacioId":  "REEMPLAZAR_CON_ID",
                                        "rifleId":  "REEMPLAZAR_CON_ID",
                                        "jugadorId":  "REEMPLAZAR_CON_ID"
@@ -454,7 +454,7 @@
                           "body":  {
 
                                    },
-                          "description":  "Primero ejecutá Primer disparo - Consumir única bala. Esperado: 409 al volver a disparar sin munición.",
+                          "description":  "Primero ejecutá POST - Consumir única bala. Esperado: 409 al volver a disparar sin munición.",
                           "modified":  1794274870708,
                           "headers":  [
 

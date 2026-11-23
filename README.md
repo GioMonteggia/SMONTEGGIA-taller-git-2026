@@ -33,7 +33,7 @@ La corrección de POO-08 registró **18 de 24 puntos** y varias observaciones. P
 | 7. Git (3/3) | Mejora optativa: mergear `poo-08-crud-h2` en `main`. | Se aplicó al cierre de POO-09: `main` incluye POO-08 y POO-09 mediante `merge --ff-only`, sin reescribir los commits atómicos. |
 | 8. Documentación (0/3) | La documentación anunciaba una consola que fallaba; citaba el commit `dfc4981`; pedía crear a mano `GET /` aunque ya estaba en Insomnia; y tenía más de tres errores de ortografía. | Documentación alineada con el servicio, enlace actualizado al commit final de POO-08, `GET /` presente en la colección y texto corregido. |
 
-Verificación ejecutada para este cierre: `./mvnw.cmd test` terminó con `Tests run: 6, Failures: 0, Errors: 0, Skipped: 0` y `BUILD SUCCESS`. También se arrancó el servicio y se comprobaron `GET /`, el CRUD, las acciones por interfaz, el disparo, la recarga, los errores 400/404/409, Swagger UI y la consola H2.
+Verificación histórica de POO-08: `./mvnw.cmd test` terminó con `Tests run: 6, Failures: 0, Errors: 0, Skipped: 0` y `BUILD SUCCESS`. El estado final de POO-09 registra 26 pruebas, detalladas más abajo. También se arrancó el servicio y se comprobaron `GET /`, el CRUD, las acciones por interfaz, el disparo, la recarga, los errores 400/404/409, Swagger UI y la consola H2.
 
 ## POO-09 — Challenge de APIs cruzadas
 
@@ -138,7 +138,7 @@ Las 26 pruebas automatizadas pasaron con `Failures: 0, Errors: 0`. En la reverif
 
 Importar `insomnia/POO-09-APIS-CRUZADAS.json`. El entorno trae `a1_base_url`, `a2_base_url`, `a3_base_url` y los IDs a reemplazar. Orden: consultar los tres OpenAPI; crear jugador y rifles; dejar 29/30 el rifle del camino feliz; ejecutar el escenario feliz; listar jugadas; ejecutar los dos rechazos y volver a listar para comprobar que el H2 quedó igual. La colección incluye respuestas de ejemplo para el feliz, el rechazo de A2 y el de A3.
 
-Enlace al commit de la solución: https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026/commit/c28b52d620660958569c744e585879817a3c2492
+Enlace al commit de la solución: https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026/commit/c28b52d620660958569c744e585879817a3c2492 (commit de integración estable: un commit no puede autorreferenciarse. Las correcciones finales están en el tip de la rama y de `main`, que es el hash que se entrega en Classroom.)
 
 ## Modelo y persistencia
 

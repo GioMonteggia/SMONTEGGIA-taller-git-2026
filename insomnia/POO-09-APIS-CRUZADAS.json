@@ -218,7 +218,7 @@
       "settingRebuildPath": true
     },
     {
-      "_id": "req_crear_vacio",
+      "_id": "req_crear_caro",
       "_type": "request",
       "parentId": "fld_preparar",
       "name": "Crear rifle caro (precio 25000)",
@@ -247,7 +247,7 @@
       "settingRebuildPath": true
     },
     {
-      "_id": "req_vaciar",
+      "_id": "req_ver_caro",
       "_type": "request",
       "parentId": "fld_preparar",
       "name": "Ver rifle caro creado (GET)",

@@ -60,6 +60,8 @@ public class EscenarioController {
                                         {
                                           "error": "A2 rechazó el escenario: El precio $25000.00 viola la regla económica de CS2 (rango reglamentario: $0 a $16,000).",
                                           "rechazadoPor": "A2",
+                                          "regla": "El precio del arma debe estar entre $0 y $16.000.",
+                                          "mensajeCompanero": "El precio $25000.00 viola la regla económica de CS2 (rango reglamentario: $0 a $16,000).",
                                           "codigoHttpCompanero": 422
                                         }
                                         """))),

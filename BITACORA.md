@@ -289,13 +289,13 @@ Después de estos cambios se ejecutaron nuevamente las 26 pruebas automatizadas 
 
 POO-08 (código y servicios):
 
-https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026/commit/5861daf
+https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026/commit/5861dafc471a96c95c76aaead0f847063b261fb3
 
 POO-08 (cierre de observaciones de la corrección):
 
 https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026/commit/920291e5c8bfe7bfc79db51389eb4c066e94fae8
 
-POO-09 se implementó en varios commits sobre la rama `poo-09-apis-cruzadas`: `d692ce7` (OpenAPI y reglas), `fed4984` (clientes hacia A2 y A3), `d2370df` (escenario persistido), `4c979a7` (entrega independiente), `5f91e60` (integración real de A3) y `7744e27` (integración real de A2 y round robin completo). El enlace de entrega definitiva se registra en `README.md` y apunta al commit publicado que incluye la versión final del código y de la documentación: https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026/commit/c28b52d620660958569c744e585879817a3c2492. Las correcciones finales de documentación y de codificación UTF-8 de esta auditoría están en el tip de la rama y de `main`.
+POO-09 se implementó en varios commits sobre la rama `poo-09-apis-cruzadas`: `d692ce7` (OpenAPI y reglas), `fed4984` (clientes hacia A2 y A3), `d2370df` (escenario persistido), `4c979a7` (entrega independiente), `5f91e60` (integración real de A3) y `7744e27` (integración real de A2 y round robin completo). El enlace de entrega definitiva se registra en `README.md` y apunta al commit de integración estable, porque un commit no puede autorreferenciarse: https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026/commit/c28b52d620660958569c744e585879817a3c2492. Las correcciones finales de documentación y de codificación UTF-8 de esta auditoría están en el tip de la rama y de `main`, que es el hash que se entrega en Classroom.
 
 ## 8. Resultado final
 

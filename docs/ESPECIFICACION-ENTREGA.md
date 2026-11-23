@@ -69,7 +69,7 @@ El proyecto separa las responsabilidades de los controladores REST, los servicio
 - `ArmaCrudController`: recibe las solicitudes HTTP del CRUD persistente y delega en `ArmaService`.
 - `SimulacionController`: delega las operaciones de combate en `SimulacionService` y las operaciones de jugadores en `JugadorService`.
 - `ReglasCombateController`: publica las dos reglas de A1 (`/api/reglas/disparo` y `/api/reglas/recarga`) para que otros servicios las consulten desde el OpenAPI.
-- `EscenarioController`: expone `POST /api/escenarios` y las consultas de jugadas; es el único endpoint que debe invocar el cliente.
+- `EscenarioController`: expone `POST /api/escenarios` y `GET /api/escenarios`; es el endpoint que integra las reglas de A2 y A3. El flujo de Insomnia además consulta los tres OpenAPI y crea jugador y rifle.
 
 ### Servicios
 
