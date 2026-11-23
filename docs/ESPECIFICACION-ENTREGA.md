@@ -329,8 +329,6 @@ Rama de trabajo:
 
 `poo-08-crud-h2`
 
-Commit de implementación del código:
+Commit final publicado de POO-08:
 
-https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026/commit/5861daf
-
-El enlace que se entregue en Classroom debe apuntar al commit publicado que incluya las correcciones finales del código y de la documentación.
+https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026/commit/920291e5c8bfe7bfc79db51389eb4c066e94fae8

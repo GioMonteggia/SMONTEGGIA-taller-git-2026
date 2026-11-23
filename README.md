@@ -18,6 +18,23 @@ Este proyecto implementa una API REST con Java 21 y Spring Boot para administrar
 - Mermaid
 - Licencia Apache 2.0
 
+## Situación de POO-08 y cierre de observaciones
+
+La corrección de POO-08 registró **18 de 24 puntos** y varias observaciones. POO-09 no vuelve a aplicar la rúbrica de 24: los 3 puntos de corrección se obtienen si todas las observaciones quedan cerradas. El commit final de POO-08 es `920291e5c8bfe7bfc79db51389eb4c066e94fae8`.
+
+| Criterio | Observación recibida | Cierre |
+|---|---|---|
+| 1. Entrega y arranque (2,5/3) | `/h2-console` respondía 404 con Spring Boot 4.1.1. | Se incorporó el módulo `spring-boot-h2console` y el arranque registra `H2 console available at '/h2-console'`. Verificado con una solicitud HTTP al iniciar el servicio. |
+| 2. Organización en paquetes (1/3) | `ArmaCrudController` y `SimulacionController` usaban repositorios directamente; el dominio lanzaba excepciones. | Existen `ArmaService` y `JugadorService`; los controladores delegan en servicios. Las validaciones y excepciones están en la capa de servicios. El paquete `domain` no contiene `throw new`. |
+| 3. Ocultamiento e invariantes (3/3) | Mejora optativa: un PUT restauraba la munición al máximo. | `Arma.actualizarDesde` conserva la munición actual y la limita al nuevo `municionMax`. El comportamiento está documentado más abajo. |
+| 4. Herencia y sobreescritura (3/3) | Mejora optativa sobre implementar `AccionCombate` en otra familia. | No se aplicó: no restaba puntos. `GET /api/simulacion/acciones/{armaId}` sí usa la interfaz sobre un arma persistida. |
+| 5. Constructores y sobrecarga (3/3) | Sin observaciones. | Sin cambios necesarios. |
+| 6. Comportamiento observable (2,5/3) | Misma falla de `/h2-console`; las reglas debían vivir en servicios. | Consola verificada. El cálculo de daño y la recarga se coordinan en `SimulacionService`, y además se publican como reglas validables en `ReglasCombateService`. |
+| 7. Git (3/3) | Mejora optativa: mergear `poo-08-crud-h2` en `main`. | No se aplicó: no restaba puntos. El historial conserva los commits atómicos. |
+| 8. Documentación (0/3) | La documentación anunciaba una consola que fallaba; citaba el commit `dfc4981`; pedía crear a mano `GET /` aunque ya estaba en Insomnia; y tenía más de tres errores de ortografía. | Documentación alineada con el servicio, enlace actualizado al commit final de POO-08, `GET /` presente en la colección y texto corregido. |
+
+Verificación ejecutada para este cierre: `./mvnw.cmd test` terminó con `Tests run: 6, Failures: 0, Errors: 0, Skipped: 0` y `BUILD SUCCESS`. También se arrancó el servicio y se comprobaron `GET /`, el CRUD, las acciones por interfaz, el disparo, la recarga, los errores 400/404/409, Swagger UI y la consola H2.
+
 ## Modelo y persistencia
 
 La familia principal de armas persistidas está formada por `Arma`, una clase abstracta, y sus clases hijas `Rifle` y `Pistola`. Se utiliza la estrategia de herencia JPA `SINGLE_TABLE`: las entidades de esta familia se guardan en una tabla compartida y se distinguen mediante la columna discriminadora `tipo_arma`.
@@ -451,10 +468,8 @@ El proyecto incluye el archivo `LICENSE` con la licencia Apache 2.0.
 
 ## Commit de implementación
 
-El siguiente enlace identifica el commit que contiene los cambios de código, los servicios y las pruebas automatizadas:
+El siguiente enlace identifica el commit final publicado de POO-08, con el código, los servicios, las pruebas y las correcciones documentales:
 
-https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026/commit/5861daf
-
-El enlace que se entregue en Classroom debe apuntar al commit final publicado que incluya las correcciones documentales.
+https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026/commit/920291e5c8bfe7bfc79db51389eb4c066e94fae8
 
 Repositorio: https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026

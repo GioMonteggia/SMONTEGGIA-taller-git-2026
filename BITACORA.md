@@ -240,6 +240,18 @@ Se actualizaron los documentos relacionados con la entrega:
 
 La documentación debe mantenerse alineada con el código publicado y con las pruebas realmente realizadas.
 
+### 6.7. Cierre de observaciones de la corrección
+
+Se revisó el documento de corrección de POO-08, que registró 18 de 24 puntos. Con apoyo de IA se comparó cada observación con el estado actual del repositorio y se documentó su cierre en `README.md`:
+
+- La consola H2 dejó de responder 404 al incorporar `spring-boot-h2console`.
+- El CRUD y la creación de jugadores pasaron por `ArmaService` y `JugadorService`; los controladores ya no usan repositorios directamente.
+- Las validaciones y excepciones quedaron en la capa de servicios; el paquete `domain` no lanza excepciones.
+- `Arma.actualizarDesde` conserva la munición al actualizar con PUT.
+- La documentación dejó de anunciar una consola inexistente, actualizó el enlace al commit final de POO-08, indicó que `GET /` ya está en la colección y corrigió la ortografía.
+
+Las mejoras optativas sobre `AccionCombate` en otra familia y sobre el merge en `main` no se aplicaron; el documento aclaraba que no restaban puntos.
+
 ## 7. Referencia al código publicado
 
 El siguiente commit identifica la implementación de los cambios de código y servicios de POO-08:
