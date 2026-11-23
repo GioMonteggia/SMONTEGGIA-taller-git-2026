@@ -105,7 +105,7 @@
       "modified": 1795400000008,
       "method": "GET",
       "url": "{{ a2_base_url }}/v3/api-docs",
-      "description": "OpenAPI informada por César Ramírez (A2) en el puerto 8082. Nota: al verificar el HEAD publicado de su repo, /v3/api-docs devolvió 404; ver BITACORA.md.",
+      "description": "OpenAPI de César Ramírez (A2) en el puerto 8082. El 404 del HEAD anterior quedó resuelto en su commit 24921ac; ver BITACORA.md.",
       "headers": [],
       "body": {},
       "authentication": {},
@@ -396,7 +396,7 @@
       "created": 1795400000021,
       "modified": 1795400000021,
       "statusCode": 409,
-      "body": "{\n  \"error\": \"A2 rechazó el escenario: El precio $25000.0 supera el tope de $16,000 en la economía de CS2.\",\n  \"rechazadoPor\": \"A2\",\n  \"regla\": \"El precio del arma debe estar entre $0 y $16.000.\",\n  \"mensajeCompanero\": \"El precio $25000.0 supera el tope de $16,000 en la economía de CS2.\",\n  \"codigoHttpCompanero\": 422\n}",
+      "body": "{\n  \"error\": \"A2 rechazó el escenario: El precio $25000.00 viola la regla económica de CS2 (rango reglamentario: $0 a $16,000).\",\n  \"rechazadoPor\": \"A2\",\n  \"regla\": \"El precio del arma debe estar entre $0 y $16.000.\",\n  \"mensajeCompanero\": \"El precio $25000.00 viola la regla económica de CS2 (rango reglamentario: $0 a $16,000).\",\n  \"codigoHttpCompanero\": 422\n}",
       "contentType": "application/json",
       "headers": [],
       "elapsed": 12

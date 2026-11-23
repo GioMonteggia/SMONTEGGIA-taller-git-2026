@@ -2,7 +2,7 @@
 
 Este documento aplica la [consigna de POO-09](https://github.com/alefq/afq-taller-git-2024/blob/main/docs/ejercicio-poo-09-apis-cruzadas-2026-11-16.md), la [guía de grupos](https://github.com/alefq/afq-taller-git-2024/blob/main/docs/ejercicio-poo-09-grupos-2026-11-16.md) y el [ejemplo UNO](https://github.com/alefq/afq-taller-git-2024/blob/main/docs/ejercicio-poo-09-ejemplo-uno-2026-11-16.md) a este repositorio. Los tres enlaces se verificaron con HTTP 200.
 
-**Enlace al commit de la solución:** https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026/commit/7744e2738e7f741b28761638c2f4a928c4746e6a
+**Enlace al commit de la solución:** https://github.com/GioMonteggia/INICIALES-taller-git-2026/commit/c28b52d620660958569c744e585879817a3c2492
 
 ---
 
@@ -71,17 +71,29 @@ La jugada guarda descripción, IDs de rifle y jugador, distancia, aceptación de
 Cada servicio se clona y se arranca desde su repositorio con `./mvnw spring-boot:run`. En una misma máquina se usan puertos distintos:
 
 ```powershell
-# Terminal 1 — A3 (Luis Tauber): puerto 8080, valor por defecto
-cd <clon de https://github.com/LTP22/ltauber-tp-lp3-2026>
+# Una sola vez: clonar los tres repositorios
+git clone https://github.com/LTP22/ltauber-tp-lp3-2026.git a3-tauber
+git clone https://github.com/GioMonteggia/INICIALES-taller-git-2026.git a1-monteggia
+git clone https://github.com/cesarraa/crr-taller-git-2026.git a2-ramirez
+cd a1-monteggia
+git checkout poo-09-apis-cruzadas
+cd ..
+cd a2-ramirez
+git checkout poo09-apis-cruzadas
+cd ..
+
+# Terminal 1 — A3 (Luis Tauber): puerto 8080, valor por defecto (rama main)
+cd a3-tauber
 .\mvnw.cmd spring-boot:run
 
 # Terminal 2 — A1 (este repositorio): puerto 8081 (server.port=8081)
+cd ../a1-monteggia
 $env:COMPANEROS_A2_BASE_URL="http://localhost:8082"
 $env:COMPANEROS_A3_BASE_URL="http://localhost:8080"
 .\mvnw.cmd spring-boot:run
 
-# Terminal 3 — A2 (César Ramírez): puerto 8082
-cd <clon de https://github.com/cesarraa/crr-taller-git-2026>
+# Terminal 3 — A2 (César Ramírez): puerto 8082, rama poo09-apis-cruzadas
+cd ../a2-ramirez
 $env:SERVER_PORT=8082
 .\mvnw.cmd spring-boot:run
 ```
@@ -97,19 +109,19 @@ Importar `insomnia/POO-09-APIS-CRUZADAS.json` y seguir este orden:
 3. Crear un rifle de 30 balas, guardar su ID en `rifleId` y ejecutar el disparo previo para dejarlo en 29/30.
 4. Ejecutar el escenario feliz: `POST {{ a1_base_url }}/api/escenarios` con `{ "rifleId": "{{ rifleId }}", "jugadorId": "{{ jugadorId }}", "distancia": 50, "granadaLanzada": false }` → HTTP 201.
 5. `GET {{ a1_base_url }}/api/escenarios` → aparece la jugada.
-6. Crear un rifle con `precio: 25000` y repetir el escenario → HTTP 409 de A2 (`Regla Económica CS2 Violada`); listar de nuevo → la misma cantidad de jugadas.
+6. Crear un rifle con `precio: 25000` y repetir el escenario → HTTP 409 de A2 («El precio $25000.00 viola la regla económica de CS2 (rango reglamentario: $0 a $16,000).»); listar de nuevo → la misma cantidad de jugadas.
 7. Repetir con el rifle del paso 3 y `"granadaLanzada": true` → HTTP 409 de A3 (`La granada ya fue lanzada.`); listar de nuevo → la misma cantidad de jugadas.
 
-La colección incluye respuestas de ejemplo exportadas para el feliz y para cada rechazo, además de las variables `a1_base_url`, `a2_base_url`, `a3_base_url`, `rifleId`, `jugadorId`, `rifleVacioId` y `rifleLlenoId`.
+La colección incluye respuestas de ejemplo exportadas para el feliz y para cada rechazo, además de las variables `a1_base_url`, `a2_base_url`, `a3_base_url`, `rifleId`, `jugadorId` y `rifleCaroId`.
 
 ### 4.3. Verificación ya ejecutada
 
-- `Tests run: 23, Failures: 0, Errors: 0, Skipped: 0`.
+- `Tests run: 26, Failures: 0, Errors: 0, Skipped: 0`.
 - `/v3/api-docs` y `/swagger-ui.html`: HTTP 200; el documento incluye CRUD, simulación, `/api/reglas/disparo`, `/api/reglas/recarga` y `/api/escenarios` con respuestas 201, 400, 409 y 502.
 - Round robin real: se clonaron los repos de César y Luis en carpetas temporales y se levantaron en 8082 y 8080. Camino feliz: HTTP 201 con `aceptadaPorA2: true` y `aceptadaPorA3: true`.
 - Rechazo real de A2 con un rifle de precio 25000: HTTP 409, `rechazadoPor: "A2"`, `codigoHttpCompanero: 422` y mensaje «El precio $25000.00 viola la regla económica de CS2 (rango reglamentario: $0 a $16,000).».
 - Rechazo real de A3 con `granadaLanzada: true`: HTTP 409, `rechazadoPor: "A3"`, `codigoHttpCompanero: 200` y mensaje «La granada ya fue lanzada.».
-- Conteo de jugadas en la verificación final: `2 → 3 → 3 → 3` (ningún rechazo dejó rastro). La jugada feliz quedó con id `97`, `danoEfectivo: 20` (distancia 35) y `mensajeA2` con el nombre del arma creada en A2.
+- Conteo de jugadas en la primera verificación real: `2 → 3 → 3 → 3` (ningún rechazo dejó rastro). La jugada feliz quedó con id `97`, `danoEfectivo: 20` (distancia 35) y `mensajeA2` con el nombre del arma creada en A2.
 - Verificación inversa real (sin cambios en el código de A1): se levantó el repo de Luis en 8080 con su `POST /escenarios/comprar-y-disparar` contra A1 y A2 reales. Devuelve 201 con `persistido: true` y `armaId: 1` para precio 2700 y 29 balas; 409 rechazado por César con precio 25000; y 409 rechazado por Giovanni con `balasCargador: 0`. Tras el fix de Luis en `665f8d0`, este último `motivo` quedó limpio: «El rifle no tiene munición.».
 - Reverificación final con el commit de César `24921ac`: los tres OpenAPI responden 200; el round robin volvió a dar 201 (`danoEfectivo: 20`, jugada id 129, conteo `3 → 4 → 4 → 4`) y los dos rechazos 409 sin persistir.
 

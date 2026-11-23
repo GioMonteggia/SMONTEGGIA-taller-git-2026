@@ -95,40 +95,50 @@ El orden es A2 y después A3 porque si el arma no pasa la regla económica no ti
 Cada servicio se clona y se arranca desde su propio repositorio con `./mvnw spring-boot:run`. En una misma máquina se usan puertos distintos:
 
 ```powershell
-# Terminal 1 — A3 (Luis Tauber): puerto 8080, valor por defecto
-cd <clon de https://github.com/LTP22/ltauber-tp-lp3-2026>
+# Una sola vez: clonar los tres repositorios
+git clone https://github.com/LTP22/ltauber-tp-lp3-2026.git a3-tauber
+git clone https://github.com/GioMonteggia/INICIALES-taller-git-2026.git a1-monteggia
+git clone https://github.com/cesarraa/crr-taller-git-2026.git a2-ramirez
+cd a1-monteggia
+git checkout poo-09-apis-cruzadas
+cd ..
+cd a2-ramirez
+git checkout poo09-apis-cruzadas
+cd ..
+
+# Terminal 1 — A3 (Luis Tauber): puerto 8080, valor por defecto (rama main)
+cd a3-tauber
 .\mvnw.cmd spring-boot:run
 
 # Terminal 2 — A1 (este repositorio): puerto 8081 (server.port=8081)
+cd ../a1-monteggia
 $env:COMPANEROS_A2_BASE_URL="http://localhost:8082"
 $env:COMPANEROS_A3_BASE_URL="http://localhost:8080"
 .\mvnw.cmd spring-boot:run
 
-# Terminal 3 — A2 (César Ramírez): puerto 8082
-cd <clon de https://github.com/cesarraa/crr-taller-git-2026>
+# Terminal 3 — A2 (César Ramírez): puerto 8082, rama poo09-apis-cruzadas
+cd ../a2-ramirez
 $env:SERVER_PORT=8082
 .\mvnw.cmd spring-boot:run
 ```
 
 Si los servicios están en otras máquinas, se reemplazan `localhost` por las IPs o nombres acordados. Cada clon tiene su propio H2 en `data/`.
 
-### Verificación local sin los compañeros
+### Verificación con servicios reales
 
-Sin cambiar propiedades, A2 y A3 apuntan a `http://localhost:8081`, así que se puede probar todo con un solo servicio:
+La prueba definitiva se hizo con A1 en 8081, A2 en 8082 y A3 en 8080 arrancados al mismo tiempo y con los tres OpenAPI respondiendo 200:
 
-1. Arrancar A1 y crear un jugador con `POST /api/simulacion/jugadores` (reserva 90).
-2. Crear un rifle de 30 balas con `POST /api/armas`, guardar su ID y disparar una vez para dejarlo en 29/30.
-3. `POST /api/escenarios` con ese rifle y ese jugador: HTTP 201, `danoEfectivo: 15`, `municionTransferida: 1` y una jugada nueva en `GET /api/escenarios`.
-4. Crear un rifle de 1 bala, agotarlo y repetir el escenario: HTTP 409 de **A2** y la misma cantidad de jugadas.
-5. Crear un rifle de 30/30 y repetir: HTTP 409 de **A3** y la misma cantidad de jugadas.
+1. `POST /api/escenarios` con un rifle con 29 balas y un jugador persistidos: HTTP 201, `danoEfectivo: 20`, `aceptadaPorA2: true`, `aceptadaPorA3: true` y una jugada nueva en `GET /api/escenarios`.
+2. Un rifle con precio 25000: HTTP 409 de **A2** (`codigoHttpCompanero: 422`) y la misma cantidad de jugadas.
+3. El rifle del paso 1 con `granadaLanzada: true`: HTTP 409 de **A3** (`codigoHttpCompanero: 200`, «La granada ya fue lanzada.») y la misma cantidad de jugadas.
 
-Esto se ejecutó con `Tests run: 19, Failures: 0, Errors: 0` y con solicitudes HTTP reales; los conteos de jugadas fueron `0 → 1 → 1 → 1`.
+Las 26 pruebas automatizadas pasaron con `Failures: 0, Errors: 0`. En la reverificación final con el commit `24921ac` de César, los conteos de jugadas fueron `3 → 4 → 4 → 4`: ningún rechazo persistió.
 
 ### Insomnia
 
 Importar `insomnia/POO-09-APIS-CRUZADAS.json`. El entorno trae `a1_base_url`, `a2_base_url`, `a3_base_url` y los IDs a reemplazar. Orden: consultar los tres OpenAPI; crear jugador y rifles; dejar 29/30 el rifle del camino feliz; ejecutar el escenario feliz; listar jugadas; ejecutar los dos rechazos y volver a listar para comprobar que el H2 quedó igual. La colección incluye respuestas de ejemplo para el feliz, el rechazo de A2 y el de A3.
 
-Enlace al commit de la solución: https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026/commit/7744e2738e7f741b28761638c2f4a928c4746e6a
+Enlace al commit de la solución: https://github.com/GioMonteggia/INICIALES-taller-git-2026/commit/c28b52d620660958569c744e585879817a3c2492
 
 ## Modelo y persistencia
 
@@ -588,8 +598,8 @@ El proyecto incluye el archivo `LICENSE` con la licencia Apache 2.0.
 
 ## Commits de implementación
 
-POO-08 (observaciones cerradas): https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026/commit/920291e5c8bfe7bfc79db51389eb4c066e94fae8
+POO-08 (observaciones cerradas): https://github.com/GioMonteggia/INICIALES-taller-git-2026/commit/920291e5c8bfe7bfc79db51389eb4c066e94fae8
 
-POO-09 (solución completa: OpenAPI, clientes, escenario y documentación): https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026/commit/7744e2738e7f741b28761638c2f4a928c4746e6a
+POO-09 (solución completa: OpenAPI, clientes, escenario y documentación): https://github.com/GioMonteggia/INICIALES-taller-git-2026/commit/c28b52d620660958569c744e585879817a3c2492
 
-Repositorio: https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026
+Repositorio: https://github.com/GioMonteggia/INICIALES-taller-git-2026

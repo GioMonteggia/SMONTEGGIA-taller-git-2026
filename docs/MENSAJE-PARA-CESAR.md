@@ -10,10 +10,9 @@ Los ejemplos son respuestas reales obtenidas con los tres servicios levantados
 - Swagger UI: http://localhost:8081/swagger-ui/index.html → HTTP 200.
 
 A1 usa `springdoc-openapi-starter-webmvc-ui` **3.2.1** con Spring Boot 4.1.1.
-El `/v3/api-docs` de A2 devolvió 404 al verificar el `HEAD` publicado de su
-repo (`f7a060b`): su `pom.xml` todavía no incluye springdoc. Agregando la
-dependencia 3.2.x (la 2.8.6 es para Boot 3.x) y publicándola, el endpoint queda
-disponible.
+El `/v3/api-docs` de A2 devolvió 404 en el `HEAD` anterior (`f7a060b`),
+porque su `pom.xml` no incluía springdoc. César publicó la dependencia 3.2.0 en
+su rama `poo09-apis-cruzadas` (commit `24921ac`), y ese endpoint responde 200.
 
 ## 2. Endpoint de munición de A1
 
@@ -46,12 +45,15 @@ Content-Type: application/json
 
 ## 4. IDs del H2 de A1
 
-A1 **sí siembra datos** al arrancar, así que no hace falta crearlos:
+En la máquina donde se hicieron las pruebas, el H2 de A1 ya tenía estos datos
+creados durante las verificaciones (no son sembrados por el código):
 
 - Rifle: `id = 108`, nombre `AK-47 ROUND ROBIN`, precio 2700, daño 36, precisión 0.85.
-- Jugador: `id = 100`, nombre `Jugador round robin`, vida y reserva sembradas.
+- Jugador: `id = 100`, nombre `Jugador round robin`.
 
-Con esos IDs y `distancia=35` el disparo da 20 de daño, tal como en el ejemplo.
+En un clon limpio hay que crear el rifle con `POST /api/armas` y el jugador con
+`POST /api/simulacion/jugadores`, y usar los IDs devueltos. Con esos datos y
+`distancia=35` el disparo da 20 de daño, tal como en el ejemplo.
 Si se quiere provocar el 409, se crea un rifle con `cargador: 1` mediante
 `POST http://localhost:8081/api/armas` con
 `{"tipo":"rifle","nombre":"AK-47 VACIO CESAR","precio":2700,"dano":36,"cargador":1}`,

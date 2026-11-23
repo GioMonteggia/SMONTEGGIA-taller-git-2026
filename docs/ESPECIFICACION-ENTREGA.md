@@ -37,7 +37,7 @@ Esta especificación documenta el modelo, la arquitectura, las reglas de negocio
 - Escenario con A2 y A3: `POST /api/escenarios`
 - Colección de Insomnia de POO-08: `insomnia/CS2-API-2026.json`
 - Colección de Insomnia de POO-09: `insomnia/POO-09-APIS-CRUZADAS.json`
-- Repositorio: https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026
+- Repositorio: https://github.com/GioMonteggia/INICIALES-taller-git-2026
 - Roles acordados por orden alfabético de apellido: A1 Giovanni Monteggia (puerto 8081), A2 César Ramírez (puerto 8082), A3 Luis Tauber (puerto 8080).
 - A3 publica su regla en `http://localhost:8080/v3/api-docs` (repo: https://github.com/LTP22/ltauber-tp-lp3-2026). Un arma de fuego necesita munición para disparar y una granada no se puede lanzar dos veces; validada en `POST /api/reglas/combate` con `{tieneBalas, granadaLanzada}`. Responde HTTP 200 con `aceptada: true` o `false`, y el cliente distingue el rechazo por ese campo.
 - A2 informó su regla en `http://localhost:8082/v3/api-docs` (repo: https://github.com/cesarraa/crr-taller-git-2026). El precio del arma debe estar entre $0 y $16.000; validada en `POST /api/armas` con 201 si cumple y 422 con `codigo: CS2_ECONOMIA_EXCEDIDA` si no. Al verificar el commit final `24921ac` de su rama `poo09-apis-cruzadas`, `/v3/api-docs` y `/swagger-ui/index.html` responden 200 (el 404 era del `HEAD` anterior `f7a060b`); ver `BITACORA.md`.
@@ -375,11 +375,11 @@ Durante el desarrollo se registraron los siguientes resultados en Insomnia:
 Resultados adicionales de POO-09:
 
 - `/v3/api-docs` y `/swagger-ui.html`: HTTP 200, con las rutas `/api/reglas/*` y `/api/escenarios` documentadas.
-- Escenario con A2 y A3 apuntando al propio servicio: HTTP 201, `danoEfectivo: 15`, `municionTransferida: 1` y una jugada nueva en `GET /api/escenarios`.
+- Round robin real con A2 en 8082 y A3 en 8080: HTTP 201, `danoEfectivo: 20`, `aceptadaPorA2: true`, `aceptadaPorA3: true` y una jugada nueva en `GET /api/escenarios`.
 - Rechazo de A2 (rifle con precio 25000): HTTP 409 con `rechazadoPor: "A2"`, `codigoHttpCompanero: 422` y mensaje «El precio $25000.00 viola la regla económica de CS2 (rango reglamentario: $0 a $16,000).»; A3 no se consulta y la cantidad de jugadas no cambia.
-- Rechazo de A3 (cargador lleno): HTTP 409 con `rechazadoPor: "A3"`; la cantidad de jugadas no cambia.
-- Conteo de jugadas observado: `0 → 1 → 1 → 1`.
-- Pruebas automatizadas: `Tests run: 19, Failures: 0, Errors: 0, Skipped: 0`.
+- Rechazo de A3 (granada lanzada dos veces): HTTP 409 con `rechazadoPor: "A3"` y mensaje «La granada ya fue lanzada.»; la cantidad de jugadas no cambia.
+- Conteo de jugadas observado en la reverificación final: `3 → 4 → 4 → 4`.
+- Pruebas automatizadas: `Tests run: 26, Failures: 0, Errors: 0, Skipped: 0`.
 
 Las pruebas automatizadas ejecutadas anteriormente finalizaron con `BUILD SUCCESS`, sin fallos ni errores. Para volver a comprobarlas, se puede ejecutar `.\mvnw.cmd test` desde Windows PowerShell.
 
@@ -387,7 +387,7 @@ Las pruebas automatizadas ejecutadas anteriormente finalizaron con `BUILD SUCCES
 
 Repositorio:
 
-https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026
+https://github.com/GioMonteggia/INICIALES-taller-git-2026
 
 Ramas de trabajo:
 
@@ -395,8 +395,8 @@ Ramas de trabajo:
 
 Commit final publicado de POO-08:
 
-https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026/commit/920291e5c8bfe7bfc79db51389eb4c066e94fae8
+https://github.com/GioMonteggia/INICIALES-taller-git-2026/commit/920291e5c8bfe7bfc79db51389eb4c066e94fae8
 
 Commit de la solución de POO-09:
 
-https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026/commit/7744e2738e7f741b28761638c2f4a928c4746e6a
+https://github.com/GioMonteggia/INICIALES-taller-git-2026/commit/c28b52d620660958569c744e585879817a3c2492

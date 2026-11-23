@@ -58,9 +58,9 @@ public class EscenarioController {
                                 name = "Rechazo de A2",
                                 value = """
                                         {
-                                          "error": "A2 rechazó el escenario: El precio $25000.0 supera el tope de $16,000 en la economía de CS2.",
-                                          "rechazadoPor": "A3",
-                                          "codigoHttpCompanero": 200
+                                          "error": "A2 rechazó el escenario: El precio $25000.00 viola la regla económica de CS2 (rango reglamentario: $0 a $16,000).",
+                                          "rechazadoPor": "A2",
+                                          "codigoHttpCompanero": 422
                                         }
                                         """))),
         @ApiResponse(responseCode = "502",

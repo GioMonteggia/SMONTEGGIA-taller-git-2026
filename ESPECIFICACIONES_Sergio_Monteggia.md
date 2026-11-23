@@ -4,12 +4,12 @@
 
 **Alumno:** Sergio Monteggia  
 **Asignatura:** Lenguaje de Programación 3 — ejercicio POO-06  
-**Proyecto:** SMONTEGGIA-taller-git-2026  
+**Proyecto:** INICIALES-taller-git-2026  
 **Repositorio:**  
-https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026
+https://github.com/GioMonteggia/INICIALES-taller-git-2026
 
 **Commit de la solución:**  
-https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026/commit/8ed6cf8de1843b29ac3027299ba6ed70369bbe4d
+https://github.com/GioMonteggia/INICIALES-taller-git-2026/commit/8ed6cf8de1843b29ac3027299ba6ed70369bbe4d
 
 **Tecnologías:** Java 21, Spring Boot, Maven, Git, GitHub, JUnit 5  
 **Licencia:** Apache 2.0
@@ -800,7 +800,7 @@ El hash definitivo del commit de entrega se establecerá después de completar:
 El enlace final será:
 
 ```text
-https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026/commit/8ed6cf8de1843b29ac3027299ba6ed70369bbe4d
+https://github.com/GioMonteggia/INICIALES-taller-git-2026/commit/8ed6cf8de1843b29ac3027299ba6ed70369bbe4d
 ```
 
 El `HASH_FINAL` será reemplazado por el hash completo real del commit definitivo.

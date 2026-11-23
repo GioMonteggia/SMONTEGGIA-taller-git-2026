@@ -6,7 +6,7 @@ Durante el desarrollo del proyecto se utilizó la siguiente herramienta:
 
 - **Asistente:** ChatGPT
 - **Proveedor:** OpenAI
-- **Modelo:** GPT-6
+- **Modelo:** GPT-5.6 Luna
 
 ## 2. Objetivo del uso de IA
 
@@ -254,7 +254,7 @@ Las mejoras optativas sobre `AccionCombate` en otra familia y sobre el merge en 
 
 ### 6.8. POO-09: APIs cruzadas
 
-Se verificaron los tres enlaces de la consigna (enunciado, grupos y ejemplo UNO). Las vistas `blob` devolvieron 503, por lo que se confirmó el estado con `HEAD` (HTTP 200) y se leyó el contenido desde las URLs `raw.githubusercontent.com` equivalentes. La consigna aclara que el challenge es individual y que la nota de la corrección de POO-08 se contabiliza aparte dentro de los 15 puntos.
+Se verificaron los tres enlaces de la consigna (enunciado, grupos y ejemplo UNO): las vistas `blob` responden HTTP 200 y el contenido también se leyó desde las URLs `raw.githubusercontent.com` equivalentes. La consigna aclara que el challenge es individual y que la nota de la corrección de POO-08 se contabiliza aparte dentro de los 15 puntos.
 
 Con apoyo de IA se realizaron las siguientes tareas independientes, que no dependen de los compañeros:
 
@@ -277,13 +277,13 @@ Reverificación final con el commit `24921ac` de César (rama `poo09-apis-cruzad
 
 POO-08 (código y servicios):
 
-https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026/commit/5861daf
+https://github.com/GioMonteggia/INICIALES-taller-git-2026/commit/5861daf
 
 POO-08 (cierre de observaciones de la corrección):
 
-https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026/commit/920291e5c8bfe7bfc79db51389eb4c066e94fae8
+https://github.com/GioMonteggia/INICIALES-taller-git-2026/commit/920291e5c8bfe7bfc79db51389eb4c066e94fae8
 
-POO-09 se implementó en varios commits sobre la rama `poo-09-apis-cruzadas`: `d692ce7` (OpenAPI y reglas), `fed4984` (clientes hacia A2 y A3), `d2370df` (escenario persistido), `4c979a7` (entrega independiente), `5f91e60` (integración real de A3) y `7744e27` (integración real de A2 y round robin completo). El enlace de entrega definitiva se registra en `README.md` y apunta al commit publicado que incluye la versión final del código y de la documentación: https://github.com/GioMonteggia/SMONTEGGIA-taller-git-2026/commit/7744e2738e7f741b28761638c2f4a928c4746e6a.
+POO-09 se implementó en varios commits sobre la rama `poo-09-apis-cruzadas`: `d692ce7` (OpenAPI y reglas), `fed4984` (clientes hacia A2 y A3), `d2370df` (escenario persistido), `4c979a7` (entrega independiente), `5f91e60` (integración real de A3) y `7744e27` (integración real de A2 y round robin completo). El enlace de entrega definitiva se registra en `README.md` y apunta al commit publicado que incluye la versión final del código y de la documentación: https://github.com/GioMonteggia/INICIALES-taller-git-2026/commit/c28b52d620660958569c744e585879817a3c2492. Las correcciones finales de documentación de esta auditoría están en el tip de la rama.
 
 ## 8. Resultado final
 
